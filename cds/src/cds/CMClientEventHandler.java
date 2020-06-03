@@ -11,13 +11,17 @@ public class CMClientEventHandler implements CMAppEventHandler {
 	@Override
 	public void processEvent(CMEvent arg0) {
 		// TODO Auto-generated method stub
-		if ( arg0.getType() == CMInfo.CM_DUMMY_EVENT ) {
+		switch(arg0.getType()) { // 이벤트 처리
+		case CMInfo.CM_DUMMY_EVENT:
 			dummyEvent(arg0);
+			break;
+		case CMInfo.CM_SESSION_EVENT:
+			break;
 		}
 	}
 
 	public void dummyEvent(CMEvent e) {
 		CMDummyEvent de = (CMDummyEvent) e; // 이벤트 형변환
-		System.out.println("클라이언트 측 수신 메시지 (시간) : " + de.getDummyInfo()); // 시간 출력
+		System.out.println("클라이언트 측 수신 메시지 (시간) : " + de.getDummyInfo()); // 메시지 출력
 	}
 }

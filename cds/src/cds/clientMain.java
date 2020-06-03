@@ -1,11 +1,18 @@
 package cds;
 
+import java.util.Vector;
+
 import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
 public class clientMain {
 	CMClientStub m_clientStub;
 	CMClientEventHandler m_eventHandler;
+	
+	//private c_pdf = null; // 타입 선언 필요
+	private Vector<String> c_user = null; // pdf 참여자 정보
+	private Vector<Vector<String>> c_content = null; // 각 페이지별 타 사용자의 기록
+	private Vector<String> c_history = null; // 현재 사용자의 페이지별 기록
 	
 	public clientMain() { // 객체 생성
 		m_clientStub = new CMClientStub();
@@ -25,12 +32,14 @@ public class clientMain {
 		// 이때, 본인 정보가 필요한데, 이건 CM 내에 info 객체로 CMUser 란 객체로 받아 알 수 있음
 		
 		System.out.println("클라이언트 실행 중");
-		
-		// 더미이벤트 만들어서 전송
+	}
+	
+	public void dummyEvent() { // 더미이벤트 생성 및 전송 함수
 		CMDummyEvent due = new CMDummyEvent();
 		due.setDummyInfo("서버로 전송하는 메시지");
-		System.out.println("클라이언트 ----> 서버 : " + due.getDummyInfo());
-		client.m_clientStub.send(due,"SERVER");
+		// due.setID(0);
 		
+		System.out.println("클라이언트 ----> 서버 : " + due.getDummyInfo());
+		m_clientStub.send(due,"SERVER"); // 서버로 전송	
 	}
 }
