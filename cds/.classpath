@@ -9,5 +9,8 @@
 	<classpathentry kind="lib" path="cm.jar"/>
 	<classpathentry kind="lib" path="commons-math3-3.5.jar"/>
 	<classpathentry kind="lib" path="mysql-connector-java-5.1.31-bin.jar"/>
+	<classpathentry kind="lib" path="commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="fontbox-2.0.19.jar"/>
+	<classpathentry kind="lib" path="pdfbox-2.0.19.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

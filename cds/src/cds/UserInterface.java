@@ -7,6 +7,9 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -26,7 +29,10 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	JList userList;
 	JLabel img;
 	JLabel fileLabel;
-	JTextArea note, pdf;//일단 실제 pdf대신 textArea로 놓는다
+	JTextArea note;//일단 실제 pdf대신 textArea로 놓는다
+	JLabel pdf;
+	
+	Pdf currPDF;
 	
 	UserInterface(String title) {
 		setTitle(title);
@@ -60,7 +66,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		ButtonPanel.add(nextBtn);
 		pdfPanel.add(ButtonPanel, BorderLayout.CENTER);
 		note = new JTextArea("COMMENT", 10, 40);
-		pdf = new JTextArea("PDF", 36, 40);
+		pdf = new JLabel("loading");
 		pdfPanel.add(pdf, BorderLayout.NORTH);
 		pdfPanel.add(note, BorderLayout.SOUTH);
 		frame.add(pdfPanel, BorderLayout.WEST);
@@ -100,12 +106,18 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 				fileLabel.setText(path);
 				
 				//pdf를 띄우는 부분
-				
+				currPDF = new Pdf(path);
+				pdf.setText("");
+				pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 			}
 		}else if(e.getSource() == preBtn) {
-			//pdf다음페이지 
+			//pdf 이전 페이지 
+			currPDF.decrementPageNum();
+			pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 		}else if(e.getSource() == nextBtn) {
-			//pdf 이전 페이지
+			//pdf 다음 페이지
+			currPDF.incrementPageNum();
+			pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 		}else if(e.getSource() == commentBtn) {
 			//주석달기 버튼
 		}

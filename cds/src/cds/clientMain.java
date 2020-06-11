@@ -21,7 +21,8 @@ public class clientMain {
 	
 	public static void main(String[] args) {
 		clientMain client = new clientMain();
-		
+		UserInterface UI = new UserInterface("test");
+
 		// CM Stub 에 이벤트 핸들러 등록
 		client.m_clientStub.setAppEventHandler(client.m_eventHandler);
 		client.m_clientStub.startCM(); // 실행
