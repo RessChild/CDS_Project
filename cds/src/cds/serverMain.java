@@ -24,10 +24,6 @@ public class serverMain {
 	private CMServerEventHandler m_eventHandler;
 	private CMServerStub m_serverStub;
 	
-	private Vector<File> s_pdf; // 타입 선언 필요
-	private Vector<Vector<String>> s_user; // 각 pdf 별 참여자 목록
-	private Vector<Vector<Vector<String>>> s_content; // 각 pdf 내 참여자의 기록
-	
 	public serverMain() { // 객체 생성
 		m_serverStub = new CMServerStub();
 		m_eventHandler = new CMServerEventHandler(this, m_serverStub);
@@ -77,8 +73,9 @@ public class serverMain {
 		if(fcRet != JFileChooser.APPROVE_OPTION) return;
 		files = fc.getSelectedFiles(); // 여기서 파일 선택 구문인데..
 		 */
+
 		
-		files = new File("./test.pdf");
+		files = new File("./server-file-path/test.pdf");
 		
 		strFilePath = files.getPath();
 		bReturn = m_serverStub.pushFile(strFilePath, "보낼 대상 이름", byteFileAppendMode);

@@ -3,6 +3,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
@@ -17,6 +18,11 @@ public class CMServerEventHandler implements CMAppEventHandler {
 
 	private serverMain m_server = null;
 	private CMServerStub m_serverStub = null;
+	
+	private Vector<String> s_fname; // 파일명
+	private Vector<File> s_pdf; // 타입 선언 필요
+	private Vector<Vector<String>> s_user; // 각 pdf 별 참여자 목록
+	private Vector<Vector<Vector<String>>> s_content; // 각 pdf 내 참여자의 기록
 	
 	public CMServerEventHandler(serverMain s, CMServerStub ss) {
 		// TODO Auto-generated constructor stub
@@ -55,6 +61,23 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		// 파일 전송 테스트 중
 		String p = "./server-file-path/";
 		pushFile(p+"test.pdf", de.getSender());
+		
+		switch(de.getID()) {
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+		default:
+			System.out.println("******** [DummyEvent] Can't Find to Do");
+		}
+	}
+	
+	// 클라이언트의 파일요청에 따라 해당 파일을 찾음
+	public void cFileRequest(String find) {
+		// 해당 파일을 찾아서 클라이언트에게 전송해주는 과정..
+		// 클라이언트 측 UI 가 관건이 될듯 ( 인덱스로 찾냐, 이름으로 찾냐.. )
 	}
 	
 	public void fileEvent(CMEvent e) {

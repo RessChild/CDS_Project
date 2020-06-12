@@ -25,12 +25,7 @@ import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 public class clientMain {
 	CMClientStub m_clientStub;
 	CMClientEventHandler m_eventHandler;
-	
-	private File c_pdf = null; // 타입 선언 필요
-	private Vector<String> c_user = null; // pdf 참여자 정보
-	private Vector<Vector<String>> c_content = null; // 각 페이지별 타 사용자의 기록
-	private Vector<String> c_history = null; // 현재 사용자의 페이지별 기록
-	
+		
 	public clientMain() { // 객체 생성
 		m_clientStub = new CMClientStub();
 		m_eventHandler = new CMClientEventHandler(this, m_clientStub);

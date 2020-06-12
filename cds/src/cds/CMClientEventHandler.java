@@ -5,6 +5,7 @@ import java.awt.Desktop;
 import java.awt.desktop.FilesEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
@@ -22,6 +23,11 @@ public class CMClientEventHandler implements CMAppEventHandler {
 
 	private clientMain m_client = null;
 	private CMClientStub m_clientStub = null;
+
+	private File c_pdf = null; // 타입 선언 필요
+	private Vector<String> c_user = null; // pdf 참여자 정보
+	private Vector<Vector<String>> c_content = null; // 각 페이지별 타 사용자의 기록
+	private Vector<String> c_history = null; // 현재 사용자의 페이지별 기록
 	
 	public CMClientEventHandler(clientMain c, CMClientStub cs) {
 		// TODO Auto-generated constructor stub
@@ -48,11 +54,21 @@ public class CMClientEventHandler implements CMAppEventHandler {
 	public void dummyEvent(CMEvent e) {
 		CMDummyEvent de = (CMDummyEvent) e; // 이벤트 형변환
 		System.out.println("**** 클라이언트 측 수신 메시지 (시간) : " + de.getDummyInfo()); // 메시지 출력
+		switch(de.getID()) {
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+		default:
+			System.out.println("******** [DummyEvent] Can't Find to Do");
+		}
 	}
 	
 	public void fileEvent(CMEvent e) {
 		CMFileEvent fe = (CMFileEvent) e;
-		System.out.print("**** 클라이언트 수신 파일 : " + fe.getFileBlock().toString());		
+		System.out.print("**** 클라이언트 수신 파일 : " + fe.getFileBlock().toString());
 	}
 	
 	
