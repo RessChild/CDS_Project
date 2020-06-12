@@ -84,7 +84,6 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		CMFileEvent de = (CMFileEvent) e;
 		System.out.println("**** 서버 측 수신 메시지 : 파일 요청 메시지"); // 얻은 메시지 확인
 
-
 		CMFileEvent fe = new CMFileEvent();
 		fe.setID(fe.REPLY_PERMIT_PULL_FILE);
 //		fe.setFilePath("test.pdf");
