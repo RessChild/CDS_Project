@@ -9,6 +9,7 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
+import kr.ac.konkuk.ccslab.cm.entity.CMSession;
 import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMFileEvent;
@@ -22,18 +23,16 @@ public class CMServerEventHandler implements CMAppEventHandler {
 	private serverMain m_server = null;
 	private CMServerStub m_serverStub = null;
 	
-	private Vector<File> s_pdf; // 타입 선언 필요
-	private Vector<String> s_user; // 각 pdf 별 참여자 목록
-	private Vector<Vector<Vector<String>>> s_content; // 각 pdf 내 참여자의 기록
+	private Vector<ServerPDF> s_pdf; // 타입 선언 필요
+	private Vector<String> s_user; // 참여자 목록
 	
 	public CMServerEventHandler(serverMain s, CMServerStub ss) {
 		// TODO Auto-generated constructor stub
 		m_server = s;
 		m_serverStub = ss;
 		
-		s_pdf = new Vector<File>();
+		s_pdf = new Vector<ServerPDF>();
 		s_user = new Vector<String>();
-		s_content = new Vector<Vector<Vector<String>>>();
 	}
 	
 	@Override
@@ -133,7 +132,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		CMSessionEvent se = (CMSessionEvent) e;
 		System.out.println("SessionEvent 발생 : "+ se.getID());
 		switch (se.getID()) {
-		case CMSessionEvent.LOGIN:			
+		case CMSessionEvent.LOGIN:	// 1번 이벤트
 			CMDummyEvent nde = new CMDummyEvent();
 			StringBuilder sb = new StringBuilder();
 			nde.setID(2);
@@ -153,8 +152,10 @@ public class CMServerEventHandler implements CMAppEventHandler {
 				System.out.println("******************** [로그인] 신규 유저 정보 전송");
 				
 			}
-
-			
+		case CMSessionEvent.ADD_BLOCK_SOCKET_CHANNEL: // 22번 이벤트
+			break;
+		case CMSessionEvent.JOIN_SESSION: // 6번 이벤트
+			System.out.println("새로운 대상이 참여 : " + se.getSender());
 			break;
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + se.getID());

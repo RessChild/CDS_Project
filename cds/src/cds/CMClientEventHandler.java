@@ -25,11 +25,10 @@ public class CMClientEventHandler implements CMAppEventHandler {
 	private CMClientStub m_clientStub = null;
 	private UserInterface UI;
 	
-	private File c_pdf = null; // 타입 선언 필요
+	private File c_pdf = null; // 현재 사용중인 파일
 	private int c_fnum = -1; // 선택한 파일의 인덱스 번호
 	private Vector<String> c_user; // pdf 참여자 정보
 	private String c_content = null; // 현재 페이지의 기록
-	
 	
 	public CMClientEventHandler(clientMain c, CMClientStub cs, UserInterface ui) {
 		// TODO Auto-generated constructor stub
