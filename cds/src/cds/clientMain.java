@@ -56,13 +56,17 @@ public class clientMain {
 		
 		System.out.println("클라이언트 실행 중");
 	}
+	
 	public void showFileList(String[] fileList) {
 		UI.dialog = new FileDialog(UI, fileList);
 	}
+	
 	public void dummyEvent(String message) { // 더미이벤트 생성 및 전송 함수
 		CMDummyEvent due = new CMDummyEvent();
-		due.setDummyInfo(message);
+		// due.setDummyInfo("서버로 전송하는 메시지");
 		// due.setID(0);
+		due.setDummyInfo("FileListRequest");
+		due.setID(1);
 		
 		System.out.println("**** [DummyEvent] 클라이언트 ----> 서버  : " + due.getDummyInfo());
 		m_clientStub.send(due,"SERVER"); // 서버로 전송	

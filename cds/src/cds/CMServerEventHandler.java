@@ -27,6 +27,8 @@ public class CMServerEventHandler implements CMAppEventHandler {
 	private Vector<Vector<String>> s_user; // 각 pdf 별 참여자 목록
 	private Vector<Vector<Vector<String>>> s_content; // 각 pdf 내 참여자의 기록
 	
+	private static int FILE_LIST_REQ_ID = 1;
+	
 	public CMServerEventHandler(serverMain s, CMServerStub ss) {
 		// TODO Auto-generated constructor stub
 		m_server = s;
@@ -71,29 +73,22 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		fileList.add("file2");
 		fileList.add("fil3");
 		
-		
-		if (de.getDummyInfo().equals("FileListRequest")) {
+		if (de.getID() == FILE_LIST_REQ_ID) {
 			CMDummyEvent nde = new CMDummyEvent();
-			nde.setID(1);
+			nde.setID(FILE_LIST_REQ_ID);
+			
 			StringBuilder msg = new StringBuilder();
 			for(String file : fileList) {
 				msg.append(file + "#");
 			}
 			System.out.println("****** [FILELIST EVENT MSG] *******");
-			System.out.println("MSG : msg");
+			System.out.println("MSG : " + msg);
 			
 			nde.setDummyInfo(msg.toString());
 			m_serverStub.send(nde, de.getSender());
 		}
-		
-		switch(de.getID()) {
-		case 0:
-			break;
-		case 1:
-			break;
-		case 2:
-			break;
-		default:
+		else 
+		{
 			System.out.println("******** [DummyEvent] Can't Find to Do");
 		}
 	}

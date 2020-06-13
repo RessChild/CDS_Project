@@ -60,6 +60,10 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			break;
 		case 1:
 			String []fileList = de.getDummyInfo().split("#");
+			for(String file: fileList) {
+				System.out.print(file + ", ");
+			}
+			System.out.println();
 			m_client.showFileList(fileList);
 			break;
 		case 2:

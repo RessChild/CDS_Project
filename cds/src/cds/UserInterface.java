@@ -183,6 +183,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 			//서버에서 pdf파일을 불러옴
 			CMDummyEvent due = new CMDummyEvent();
 			due.setDummyInfo("FileListRequest");
+			due.setID(1);
 			this.m_clientStub.send(due, "SERVER");
 		} else if(e.getSource() == preBtn) {
 			//pdf 이전 페이지 
