@@ -25,23 +25,32 @@ import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
+import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
+
 public class UserInterface extends JFrame implements ActionListener, ListSelectionListener{
 	int screenWidth;
 	int screenHeight;
-	JPanel filePanel, ButtonPanel,centerPanel,pdfPanel, userPanel;
+	JPanel filePanel, fileButtonPanel, ButtonPanel,centerPanel,pdfPanel, userPanel;
 	JScrollPane pdfImgPanel, noteJSP;
 	Container frame;
-	JButton fileButton, nextBtn, preBtn, commentBtn;
+	JButton ServerFileButton, LocalFileButton, nextBtn, preBtn, commentBtn;
 	JList userList;
 	JLabel fileLabel;
 	JTextArea note;//일단 실제 pdf대신 textArea로 놓는다
 	JLabel pdf;
-	
+	FileDialog dialog;
+	CMClientStub m_clientStub;
+	CMClientEventHandler m_eventHandler;
 	// 사용자가 불러온 PDF 페이지 별 이미지 및 파일 정보 저장하고 있는 객체
 	Pdf currPDF;
+	String selectedFile;
 	
-	UserInterface(String title) {
+	UserInterface(String title, CMClientStub m_clientStub,
+	   CMClientEventHandler m_eventHandler) {
 		setTitle(title);
+		this.m_clientStub = m_clientStub;
+		this.m_eventHandler = m_eventHandler;
 		Toolkit kit = this.getToolkit();//시스템 정보를 가져옴, AWT에 있다.
 		Dimension screenSize= kit.getScreenSize();//반환값이 Dimension(폭과 높이정보를 가진 하나의 타입)
 		this.screenWidth = screenSize.width;
@@ -59,12 +68,14 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	
 	public void fileSwing() {
 		filePanel = new JPanel(new BorderLayout());
-		
-		fileButton = new JButton("파일 선택");
+		fileButtonPanel = new JPanel(new FlowLayout());
+		ServerFileButton = new JButton("서버에서 파일 선택");
+		LocalFileButton = new JButton("로컬에서 파일 선택");
 		fileLabel = new JLabel();
-		
+		fileButtonPanel.add(LocalFileButton);
+		fileButtonPanel.add(ServerFileButton);
 		filePanel.add(fileLabel, BorderLayout.WEST);
-		filePanel.add(fileButton, BorderLayout.EAST);
+		filePanel.add(fileButtonPanel, BorderLayout.EAST);
 		
 		frame.add(filePanel, BorderLayout.NORTH);		
 	}
@@ -145,7 +156,8 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		userSwing();
 		
 		// 버튼 클릭 리스너 추가
-		fileButton.addActionListener(this);
+		LocalFileButton.addActionListener(this);
+		ServerFileButton.addActionListener(this);
 		preBtn.addActionListener(this);
 		nextBtn.addActionListener(this);
 		commentBtn.addActionListener(this);
@@ -153,8 +165,8 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == fileButton) {
-			//아무곳에나 있는 그림 파일을 불러 올수 있다.
+		if(e.getSource() == LocalFileButton) {
+			//로컬의 pdf 파일을 불러 올수 있다.
 			JFileChooser filedlg = new JFileChooser();
 			int result = filedlg.showOpenDialog(this);//int를 반환, ok or cancel
 			if(result == JFileChooser.APPROVE_OPTION) {
@@ -167,7 +179,12 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 				currPDF = new Pdf(path);
 				pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 			}
-		}else if(e.getSource() == preBtn) {
+		}else if(e.getSource() == ServerFileButton) {
+			//서버에서 pdf파일을 불러옴
+			CMDummyEvent due = new CMDummyEvent();
+			due.setDummyInfo("FileListRequest");
+			this.m_clientStub.send(due, "SERVER");
+		} else if(e.getSource() == preBtn) {
 			//pdf 이전 페이지 
 			currPDF.decrementPageNum();
 			pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));

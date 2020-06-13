@@ -54,10 +54,13 @@ public class CMClientEventHandler implements CMAppEventHandler {
 	public void dummyEvent(CMEvent e) {
 		CMDummyEvent de = (CMDummyEvent) e; // 이벤트 형변환
 		System.out.println("**** 클라이언트 측 수신 메시지 (시간) : " + de.getDummyInfo()); // 메시지 출력
+		
 		switch(de.getID()) {
 		case 0:
 			break;
 		case 1:
+			String []fileList = de.getDummyInfo().split("#");
+			m_client.showFileList(fileList);
 			break;
 		case 2:
 			break;
