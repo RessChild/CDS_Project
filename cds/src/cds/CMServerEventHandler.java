@@ -3,6 +3,8 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
@@ -10,6 +12,7 @@ import javax.swing.JOptionPane;
 import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMFileEvent;
+import kr.ac.konkuk.ccslab.cm.event.CMSessionEvent;
 import kr.ac.konkuk.ccslab.cm.event.handler.CMAppEventHandler;
 import kr.ac.konkuk.ccslab.cm.info.CMInfo;
 import kr.ac.konkuk.ccslab.cm.stub.CMServerStub;
@@ -38,6 +41,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 			dummyEvent(arg0);
 			break;
 		case CMInfo.CM_SESSION_EVENT:
+			processSessionEvent(arg0);
 			break;
 		case CMInfo.CM_FILE_EVENT:
 			fileEvent(arg0);
@@ -59,8 +63,28 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		*/
 		
 		// 파일 전송 테스트 중
-		String p = "./server-file-path/";
-		pushFile(p+"test.pdf", de.getSender());
+//		String p = "./server-file-path/";
+//		pushFile(p+"test.pdf", de.getSender());
+		
+		List<String> fileList = new ArrayList<>();
+		fileList.add("file1");
+		fileList.add("file2");
+		fileList.add("fil3");
+		
+		
+		if (de.getDummyInfo().equals("FileListRequest")) {
+			CMDummyEvent nde = new CMDummyEvent();
+			nde.setID(1);
+			StringBuilder msg = new StringBuilder();
+			for(String file : fileList) {
+				msg.append(file + "#");
+			}
+			System.out.println("****** [FILELIST EVENT MSG] *******");
+			System.out.println("MSG : msg");
+			
+			nde.setDummyInfo(msg.toString());
+			m_serverStub.send(nde, de.getSender());
+		}
 		
 		switch(de.getID()) {
 		case 0:
@@ -133,6 +157,18 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		bReturn = m_serverStub.pushFile(strFilePath, who, byteFileAppendMode);
 		if (!bReturn) {
 			System.out.println("*************** 파일 전송 에러! **************");
+		}
+	}
+	
+	private void processSessionEvent(CMEvent cme) {
+		CMSessionEvent se = (CMSessionEvent) cme;
+		switch(se.getID()) 
+		{
+		case CMSessionEvent.LOGIN:
+			System.out.println(se.getUserName() + " requested login");
+			break;
+		default:
+			return;
 		}
 	}
 }

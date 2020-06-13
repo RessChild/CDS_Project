@@ -9,6 +9,7 @@ import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import kr.ac.konkuk.ccslab.cm.entity.CMList;
@@ -25,10 +26,12 @@ import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 public class clientMain {
 	CMClientStub m_clientStub;
 	CMClientEventHandler m_eventHandler;
+	String userName;
 		
 	public clientMain() { // 객체 생성
 		m_clientStub = new CMClientStub();
 		m_eventHandler = new CMClientEventHandler(this, m_clientStub);
+		userName = null;
 	}
 	
 	public static void main(String[] args) {
@@ -37,9 +40,15 @@ public class clientMain {
 
 		// CM Stub 에 이벤트 핸들러 등록
 		client.m_clientStub.setAppEventHandler(client.m_eventHandler);
+		
+		client.getLoginInfo();
+		
 		client.m_clientStub.startCM(); // 실행
-		client.m_clientStub.loginCM("201511231", "201511231"); // 서버에 로그인
-
+		
+		if (client.userName != null) {
+			client.m_clientStub.loginCM(client.userName, "");
+		}
+				
 		// CMDummyEvent 객체를 만들어서 전송
 		// 메시지를 실제로 보내는건 Stub 내의 cast 함수로 전송 가능
 		// 이때, 본인 정보가 필요한데, 이건 CM 내에 info 객체로 CMUser 란 객체로 받아 알 수 있음
@@ -72,6 +81,20 @@ public class clientMain {
 		
 		strPath = ".";
 		m_clientStub.setTransferedFileHome(Paths.get(strPath));
+	}
+	
+	public void getLoginInfo() {
+		
+		JTextField userNameField = new JTextField();
+		Object[] message = {
+				"User Name:", userNameField
+		};
+		int option = JOptionPane.showConfirmDialog(null, message, "Login Input", JOptionPane.OK_CANCEL_OPTION);
+		if (option == JOptionPane.OK_OPTION)
+		{
+			userName = userNameField.getText();
+		}
+		
 	}
     /*
 	public void testPushFile()
