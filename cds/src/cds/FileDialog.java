@@ -26,6 +26,7 @@ public class FileDialog extends JDialog implements ActionListener, ListSelection
 		this.UI = UI;
 		this.fileList = fileList;
 		init();
+		this.setSize(300, 300);
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		this.setVisible(true);
 	}
@@ -38,9 +39,12 @@ public class FileDialog extends JDialog implements ActionListener, ListSelection
 		buttonPanel.add(cancel);
 		
 		List = new JList(fileList);
+		confirm.addActionListener(this);
+		cancel.addActionListener(this);
 		listPanel.add(List, BorderLayout.NORTH);
 		listPanel.add(buttonPanel, BorderLayout.SOUTH);
 		List.addListSelectionListener(this);
+		this.add(listPanel, BorderLayout.CENTER);
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {

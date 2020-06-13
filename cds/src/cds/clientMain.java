@@ -69,7 +69,7 @@ public class clientMain {
 		due.setID(1);
 		
 		System.out.println("**** [DummyEvent] 클라이언트 ----> 서버  : " + due.getDummyInfo());
-		m_clientStub.send(due,"SERVER"); // 서버로 전송	
+		//m_clientStub.send(due,"SERVER"); // 서버로 전송	
 	}
 
 	public void fileEvent() { // 더미이벤트 생성 및 전송 함수
