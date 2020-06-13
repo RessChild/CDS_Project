@@ -23,16 +23,20 @@ public class CMClientEventHandler implements CMAppEventHandler {
 
 	private clientMain m_client = null;
 	private CMClientStub m_clientStub = null;
-
-	private File c_pdf = null; // 타입 선언 필요
-	private Vector<String> c_user = null; // pdf 참여자 정보
-	private Vector<Vector<String>> c_content = null; // 각 페이지별 타 사용자의 기록
-	private Vector<String> c_history = null; // 현재 사용자의 페이지별 기록
+	private UserInterface UI;
 	
-	public CMClientEventHandler(clientMain c, CMClientStub cs) {
+	private File c_pdf = null; // 타입 선언 필요
+	private int c_fnum = -1; // 선택한 파일의 인덱스 번호
+	private Vector<String> c_user; // pdf 참여자 정보
+	private String c_content = null; // 현재 페이지의 기록
+	
+	
+	public CMClientEventHandler(clientMain c, CMClientStub cs, UserInterface ui) {
 		// TODO Auto-generated constructor stub
 		m_client = c;
 		m_clientStub = cs;
+		UI = ui;
+		c_user = new Vector<String>();
 	}
 	
 	@Override
@@ -53,17 +57,30 @@ public class CMClientEventHandler implements CMAppEventHandler {
 
 	public void dummyEvent(CMEvent e) {
 		CMDummyEvent de = (CMDummyEvent) e; // 이벤트 형변환
-		System.out.println("**** 클라이언트 측 수신 메시지 (시간) : " + de.getDummyInfo()); // 메시지 출력
+		System.out.println("**** 클라이언트 측 수신 메시지 : " + de.getDummyInfo()); // 메시지 출력
+
+		String[] strs = de.getDummyInfo().split("#"); // 샵을 기준으로 쪼갬
 		switch(de.getID()) {
-		case 0:
+		case 1: // 보유중인 파일 리스트 반환
 			break;
-		case 1:
+		case 2: // 참가자 정보 입력
+			for(String str: strs) {
+				if(str.isEmpty()) continue;
+				c_user.add(str);
+			}
 			break;
-		case 2:
+		case 3: // 주석 정보
+			break;
+		case 4: // 신규 유저 정보
+			c_user.add(strs[0]);
+			System.out.println("**** 클라이언트 : 신규유저 추가"); // 메시지 출력	
 			break;
 		default:
 			System.out.println("******** [DummyEvent] Can't Find to Do");
+			break;
 		}
+		
+		System.out.println(c_user); // 메시지 출력
 	}
 	
 	public void fileEvent(CMEvent e) {
