@@ -23,8 +23,10 @@ public class CMServerEventHandler implements CMAppEventHandler {
 	private serverMain m_server = null;
 	private CMServerStub m_serverStub = null;
 	
-	private Vector<ServerPDF> s_pdf; // Å¸ÀÔ ¼±¾ğ ÇÊ¿ä
-	private Vector<String> s_user; // Âü¿©ÀÚ ¸ñ·Ï
+	private Vector<ServerPDF> s_pdf; // íƒ€ì… ì„ ì–¸ í•„ìš”
+	private Vector<String> s_user; // ì°¸ì—¬ì ëª©ë¡
+	
+	private static int FILE_LIST_REQ_ID = 1;
 	
 	public CMServerEventHandler(serverMain s, CMServerStub ss) {
 		// TODO Auto-generated constructor stub
@@ -38,9 +40,9 @@ public class CMServerEventHandler implements CMAppEventHandler {
 	@Override
 	public void processEvent(CMEvent arg0) {
 		// TODO Auto-generated method stub
-		System.out.println("¼­¹ö¿¡ ÀÌº¥Æ® ¹ß»ı : "+ arg0.getType());
+		System.out.println("ì„œë²„ì— ì´ë²¤íŠ¸ ë°œìƒ : "+ arg0.getType());
 		
-		switch(arg0.getType()) { // ÀÌº¥Æ® Ã³¸®
+		switch(arg0.getType()) { // ì´ë²¤íŠ¸ ì²˜ë¦¬
 		case CMInfo.CM_DUMMY_EVENT:
 			dummyEvent(arg0);
 			break;
@@ -55,9 +57,9 @@ public class CMServerEventHandler implements CMAppEventHandler {
 	
 	public void dummyEvent(CMEvent e) {
 		CMDummyEvent de = (CMDummyEvent) e;
-		System.out.println("**** [DummyEvent] ¼­¹ö Ãø ¼ö½Å ¸Ş½ÃÁö : "+de.getDummyInfo()); // ¾òÀº ¸Ş½ÃÁö È®ÀÎ
+		System.out.println("**** [DummyEvent] ì„œë²„ ì¸¡ ìˆ˜ì‹  ë©”ì‹œì§€ : "+de.getDummyInfo()); // ì–»ì€ ë©”ì‹œì§€ í™•ì¸
 
-		// ÆÄÀÏ Àü¼Û Å×½ºÆ® Áß
+		// íŒŒì¼ ì „ì†¡ í…ŒìŠ¤íŠ¸ ì¤‘
 //		String p = "./server-file-path/";
 //		pushFile(p+"test.pdf", de.getSender());
 		
@@ -66,51 +68,55 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		fileList.add("file2");
 		fileList.add("fil3");
 		
-		if (de.getDummyInfo().equals("FileListRequest")) {
+		if (de.getID() == FILE_LIST_REQ_ID) {
 			CMDummyEvent nde = new CMDummyEvent();
-			nde.setID(1);
+			nde.setID(FILE_LIST_REQ_ID);
+			
 			StringBuilder msg = new StringBuilder();
 			for(String file : fileList) {
 				msg.append(file + "#");
 			}
 			System.out.println("****** [FILELIST EVENT MSG] *******");
-			System.out.println("MSG : msg");
+			System.out.println("MSG : " + msg);
 			
 			nde.setDummyInfo(msg.toString());
 			m_serverStub.send(nde, de.getSender());
 		}
-		
+		else 
+    {
+    }
+
 		/*
 		 		CMDummyEvent nde = new CMDummyEvent();
 		StringBuilder sb = new StringBuilder();
 		
 		switch(de.getID()) {
-		case 1: // ÇöÀç º¸À¯ÇÑ ÆÄÀÏ¸®½ºÆ® ¹İÈ¯
+		case 1: // í˜„ì¬ ë³´ìœ í•œ íŒŒì¼ë¦¬ìŠ¤íŠ¸ ë°˜í™˜
 			nde.setID(1);
 
-			for (File pdf : s_pdf) { // ¸ğµç ÆÄÀÏÀÇ ÀÌ¸§À» ¹®ÀÚ¿­·Î º¯È¯
+			for (File pdf : s_pdf) { // ëª¨ë“  íŒŒì¼ì˜ ì´ë¦„ì„ ë¬¸ìì—´ë¡œ ë³€í™˜
 				System.out.println(pdf);
 				sb.append(pdf.getName() + "#");
 			}
 //			sb.append("abc");
-			System.out.println("****¿ä±îÁö");
+			System.out.println("****ìš”ê¹Œì§€");
 
 			nde.setDummyInfo(sb.toString());
-			m_serverStub.send(nde, de.getSender()); // ¸Ş½ÃÁö Àü¼Û
-			System.out.println("******************** [´õ¹ÌÀÌº¥Æ®] ¼­¹ö-->Å¬¶óÀÌ¾ğÆ® : ÆÄÀÏ¸®½ºÆ® ¸Ş½ÃÁö Àü¼Û ¿Ï·á");
+			m_serverStub.send(nde, de.getSender()); // ë©”ì‹œì§€ ì „ì†¡
+			System.out.println("******************** [ë”ë¯¸ì´ë²¤íŠ¸] ì„œë²„-->í´ë¼ì´ì–¸íŠ¸ : íŒŒì¼ë¦¬ìŠ¤íŠ¸ ë©”ì‹œì§€ ì „ì†¡ ì™„ë£Œ");
 			break;
-		case 2: // »ç¿ëÀÚ ÀÌ¸§ ¹İÈ¯
+		case 2: // ì‚¬ìš©ì ì´ë¦„ ë°˜í™˜
 			nde.setID(2);
 			
-			for (String user : s_user) { // ¸ğµç ÆÄÀÏÀÇ ÀÌ¸§À» ¹®ÀÚ¿­·Î º¯È¯
+			for (String user : s_user) { // ëª¨ë“  íŒŒì¼ì˜ ì´ë¦„ì„ ë¬¸ìì—´ë¡œ ë³€í™˜
 				sb.append(user + "#");
 			}
 			
 			nde.setDummyInfo(sb.toString());
-			m_serverStub.send(nde, de.getSender()); // ¸Ş½ÃÁö Àü¼Û
-			System.out.println("******************** [´õ¹ÌÀÌº¥Æ®] ¼­¹ö-->Å¬¶óÀÌ¾ğÆ® : À¯Àú ¸®½ºÆ® Àü¼Û ¿Ï·á");
+			m_serverStub.send(nde, de.getSender()); // ë©”ì‹œì§€ ì „ì†¡
+			System.out.println("******************** [ë”ë¯¸ì´ë²¤íŠ¸] ì„œë²„-->í´ë¼ì´ì–¸íŠ¸ : ìœ ì € ë¦¬ìŠ¤íŠ¸ ì „ì†¡ ì™„ë£Œ");
 			break;
-		case 3: // ÇØ´ç ÆäÀÌÁö¿¡ ±â·ÏµÈ ÁÖ¼®Á¤º¸
+		case 3: // í•´ë‹¹ í˜ì´ì§€ì— ê¸°ë¡ëœ ì£¼ì„ì •ë³´
 			nde.setID(3);
 			String[] wd = de.getDummyInfo().split("#");
 			int f = Integer.parseInt(wd[0]),
@@ -118,8 +124,8 @@ public class CMServerEventHandler implements CMAppEventHandler {
 				p = Integer.parseInt(wd[2]);
 			sb.append(s_content.get(f).get(u).get(p));
 			nde.setDummyInfo(sb.toString());
-			m_serverStub.send(nde, de.getSender()); // ¸Ş½ÃÁö Àü¼Û
-			System.out.println("******************** [´õ¹ÌÀÌº¥Æ®] ¼­¹ö-->Å¬¶óÀÌ¾ğÆ® : ÆäÀÌÁö ÁÖ¼® Àü¼Û ¿Ï·á");
+			m_serverStub.send(nde, de.getSender()); // ë©”ì‹œì§€ ì „ì†¡
+			System.out.println("******************** [ë”ë¯¸ì´ë²¤íŠ¸] ì„œë²„-->í´ë¼ì´ì–¸íŠ¸ : í˜ì´ì§€ ì£¼ì„ ì „ì†¡ ì™„ë£Œ");
 			break;
 		default:
 			System.out.println("******** [DummyEvent] Can't Find to Do");
@@ -130,59 +136,59 @@ public class CMServerEventHandler implements CMAppEventHandler {
 	
 	public void sessionEvent(CMEvent e) {
 		CMSessionEvent se = (CMSessionEvent) e;
-		System.out.println("SessionEvent ¹ß»ı : "+ se.getID());
+		System.out.println("SessionEvent ë°œìƒ : "+ se.getID());
 		switch (se.getID()) {
-		case CMSessionEvent.LOGIN:	// 1¹ø ÀÌº¥Æ®
+		case CMSessionEvent.LOGIN:	// 1ë²ˆ ì´ë²¤íŠ¸
 			CMDummyEvent nde = new CMDummyEvent();
 			StringBuilder sb = new StringBuilder();
 			nde.setID(2);
-			for (String user : s_user) { // ¸ğµç ÆÄÀÏÀÇ ÀÌ¸§À» ¹®ÀÚ¿­·Î º¯È¯
+			for (String user : s_user) { // ëª¨ë“  íŒŒì¼ì˜ ì´ë¦„ì„ ë¬¸ìì—´ë¡œ ë³€í™˜
 				sb.append(user + "#");
 			}
 			nde.setDummyInfo(sb.toString());
-			m_serverStub.send(nde, se.getSender()); // ¸Ş½ÃÁö Àü¼Û
-			System.out.println("******************** [·Î±×ÀÎ] ¼­¹ö-->Å¬¶óÀÌ¾ğÆ® : À¯Àú ¸®½ºÆ® Àü¼Û ¿Ï·á");
+			m_serverStub.send(nde, se.getSender()); // ë©”ì‹œì§€ ì „ì†¡
+			System.out.println("******************** [ë¡œê·¸ì¸] ì„œë²„-->í´ë¼ì´ì–¸íŠ¸ : ìœ ì € ë¦¬ìŠ¤íŠ¸ ì „ì†¡ ì™„ë£Œ");
 
-			if(!s_user.contains(se.getSender())) { // »ç¿ëÀÚ ÀÌ¸§ Ãß°¡
+			if(!s_user.contains(se.getSender())) { // ì‚¬ìš©ì ì´ë¦„ ì¶”ê°€
 				s_user.add(se.getSender());
 				CMDummyEvent nde2 = new CMDummyEvent();
-				nde2.setID(4); // »õ·Î¿î ÀÎ¿øÀÌ Ãß°¡µÊ
+				nde2.setID(4); // ìƒˆë¡œìš´ ì¸ì›ì´ ì¶”ê°€ë¨
 				nde2.setDummyInfo(se.getSender());
-				m_serverStub.broadcast(nde2); // ¸Ş½ÃÁö Àü¼Û
-				System.out.println("******************** [·Î±×ÀÎ] ½Å±Ô À¯Àú Á¤º¸ Àü¼Û");
+				m_serverStub.broadcast(nde2); // ë©”ì‹œì§€ ì „ì†¡
+				System.out.println("******************** [ë¡œê·¸ì¸] ì‹ ê·œ ìœ ì € ì •ë³´ ì „ì†¡");
 				
 			}
-		case CMSessionEvent.ADD_BLOCK_SOCKET_CHANNEL: // 22¹ø ÀÌº¥Æ®
+		case CMSessionEvent.ADD_BLOCK_SOCKET_CHANNEL: // 22ë²ˆ ì´ë²¤íŠ¸
 			break;
-		case CMSessionEvent.JOIN_SESSION: // 6¹ø ÀÌº¥Æ®
-			System.out.println("»õ·Î¿î ´ë»óÀÌ Âü¿© : " + se.getSender());
+		case CMSessionEvent.JOIN_SESSION: // 6ë²ˆ ì´ë²¤íŠ¸
+			System.out.println("ìƒˆë¡œìš´ ëŒ€ìƒì´ ì°¸ì—¬ : " + se.getSender());
 			break;
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + se.getID());
 		}
 	}
 	
-	// Å¬¶óÀÌ¾ğÆ®ÀÇ ÆÄÀÏ¿äÃ»¿¡ µû¶ó ÇØ´ç ÆÄÀÏÀ» Ã£À½
+	// í´ë¼ì´ì–¸íŠ¸ì˜ íŒŒì¼ìš”ì²­ì— ë”°ë¼ í•´ë‹¹ íŒŒì¼ì„ ì°¾ìŒ
 	public void cFileRequest(String find) {
-		// ÇØ´ç ÆÄÀÏÀ» Ã£¾Æ¼­ Å¬¶óÀÌ¾ğÆ®¿¡°Ô Àü¼ÛÇØÁÖ´Â °úÁ¤..
-		// Å¬¶óÀÌ¾ğÆ® Ãø UI °¡ °ü°ÇÀÌ µÉµí ( ÀÎµ¦½º·Î Ã£³Ä, ÀÌ¸§À¸·Î Ã£³Ä.. )
+		// í•´ë‹¹ íŒŒì¼ì„ ì°¾ì•„ì„œ í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ì „ì†¡í•´ì£¼ëŠ” ê³¼ì •..
+		// í´ë¼ì´ì–¸íŠ¸ ì¸¡ UI ê°€ ê´€ê±´ì´ ë ë“¯ ( ì¸ë±ìŠ¤ë¡œ ì°¾ëƒ, ì´ë¦„ìœ¼ë¡œ ì°¾ëƒ.. )
 	}
 	
 	public void fileEvent(CMEvent e) {
 		CMFileEvent de = (CMFileEvent) e;
-		System.out.println("**** ¼­¹ö Ãø ¼ö½Å ¸Ş½ÃÁö : ÆÄÀÏ ¿äÃ» ¸Ş½ÃÁö"); // ¾òÀº ¸Ş½ÃÁö È®ÀÎ
+		System.out.println("**** ì„œë²„ ì¸¡ ìˆ˜ì‹  ë©”ì‹œì§€ : íŒŒì¼ ìš”ì²­ ë©”ì‹œì§€"); // ì–»ì€ ë©”ì‹œì§€ í™•ì¸
 
 		CMFileEvent fe = new CMFileEvent();
 		fe.setID(fe.REPLY_PERMIT_PULL_FILE);
-//		fe.setFilePath("test.pdf");
-		System.out.println("**** ¼­¹ö ----> Å¬¶óÀÌ¾ğÆ® : "+fe.getFilePath());
-		m_serverStub.send(fe, de.getSender()); // ¿äÃ»ÀÚÇÑÅ× Àü¼Û
+		fe.setFilePath("test.pdf");
+		System.out.println("**** ì„œë²„ ----> í´ë¼ì´ì–¸íŠ¸ : "+fe.getFilePath());
+		m_serverStub.send(fe, de.getSender()); // ìš”ì²­ìí•œí…Œ ì „ì†¡
 	}
 	
-	// ÆÄÀÏ°ü·Ã ÇÔ¼ö
+	// íŒŒì¼ê´€ë ¨ í•¨ìˆ˜
 	public void setFilePath()
 	{
-		// ÆÄÀÏ °æ·Î ¼¼ÆÃ 
+		// íŒŒì¼ ê²½ë¡œ ì„¸íŒ… 
 		String strPath = null;
 
 		strPath = JOptionPane.showInputDialog("file path: ");
@@ -195,7 +201,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		
 	}
 
-	public void pushFile(String f, String who) // ÆÄÀÏ Çª½Ã
+	public void pushFile(String f, String who) // íŒŒì¼ í‘¸ì‹œ
 	{
 		String strFilePath = null;
 		File files;
@@ -212,7 +218,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		fc.setCurrentDirectory(curDir);
 		int fcRet = fc.showOpenDialog(this);
 		if(fcRet != JFileChooser.APPROVE_OPTION) return;
-		files = fc.getSelectedFiles(); // ¿©±â¼­ ÆÄÀÏ ¼±ÅÃ ±¸¹®ÀÎµ¥..
+		files = fc.getSelectedFiles(); // ì—¬ê¸°ì„œ íŒŒì¼ ì„ íƒ êµ¬ë¬¸ì¸ë°..
 		 */
 		
 		files = new File(f);
@@ -220,7 +226,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		strFilePath = files.getPath();
 		bReturn = m_serverStub.pushFile(strFilePath, who, byteFileAppendMode);
 		if (!bReturn) {
-			System.out.println("*************** ÆÄÀÏ Àü¼Û ¿¡·¯! **************");
+			System.out.println("*************** íŒŒì¼ ì „ì†¡ ì—ëŸ¬! **************");
 		}
 	}
 	

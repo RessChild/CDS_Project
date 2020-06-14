@@ -28,8 +28,14 @@ public class clientMain {
 	CMClientEventHandler m_eventHandler;
 	String userName;
 	UserInterface UI;
-	
-	public clientMain() { // °´Ã¼ »ı¼º
+
+  public clientMain() { // ê°ì²´ ìƒì„±
+  /*
+		m_clientStub = new CMClientStub();
+		m_eventHandler = new CMClientEventHandler(this, m_clientStub);
+		UI = new UserInterface("test", m_clientStub, m_eventHandler);
+*/
+
 		m_clientStub = new CMClientStub();
 		UI = new UserInterface("test");
 		m_eventHandler = new CMClientEventHandler(this, m_clientStub, UI);
@@ -39,39 +45,48 @@ public class clientMain {
 	public static void main(String[] args) {
 		clientMain client = new clientMain();
 
-		// CM Stub ¿¡ ÀÌº¥Æ® ÇÚµé·¯ µî·Ï
+		// CM Stub ì— ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬ ë“±ë¡
 		client.m_clientStub.setAppEventHandler(client.m_eventHandler);
 		client.getLoginInfo();
-		client.m_clientStub.startCM(); // ½ÇÇà
+		client.m_clientStub.startCM(); // ì‹¤í–‰
 		
 		if (client.userName != null) {
 			client.m_clientStub.loginCM(client.userName, "");
 		}
 				
-		// CMDummyEvent °´Ã¼¸¦ ¸¸µé¾î¼­ Àü¼Û
-		// ¸Ş½ÃÁö¸¦ ½ÇÁ¦·Î º¸³»´Â°Ç Stub ³»ÀÇ cast ÇÔ¼ö·Î Àü¼Û °¡´É
-		// ÀÌ¶§, º»ÀÎ Á¤º¸°¡ ÇÊ¿äÇÑµ¥, ÀÌ°Ç CM ³»¿¡ info °´Ã¼·Î CMUser ¶õ °´Ã¼·Î ¹Ş¾Æ ¾Ë ¼ö ÀÖÀ½
+		// CMDummyEvent ê°ì²´ë¥¼ ë§Œë“¤ì–´ì„œ ì „ì†¡
+		// ë©”ì‹œì§€ë¥¼ ì‹¤ì œë¡œ ë³´ë‚´ëŠ”ê±´ Stub ë‚´ì˜ cast í•¨ìˆ˜ë¡œ ì „ì†¡ ê°€ëŠ¥
+		// ì´ë•Œ, ë³¸ì¸ ì •ë³´ê°€ í•„ìš”í•œë°, ì´ê±´ CM ë‚´ì— info ê°ì²´ë¡œ CMUser ë€ ê°ì²´ë¡œ ë°›ì•„ ì•Œ ìˆ˜ ìˆìŒ
 		
+
+		//client.dummyEvent("message");
 //		client.dummyEvent();
+
 		
-		System.out.println("Å¬¶óÀÌ¾ğÆ® ½ÇÇà Áß");
+		System.out.println("í´ë¼ì´ì–¸íŠ¸ ì‹¤í–‰ ì¤‘");
 	}
 	
-	public void dummyEvent() { // ´õ¹ÌÀÌº¥Æ® »ı¼º ¹× Àü¼Û ÇÔ¼ö
+	public void showFileList(String[] fileList) {
+		UI.dialog = new FileDialog(UI, fileList);
+	}
+	
+	public void dummyEvent(String message) { // ë”ë¯¸ì´ë²¤íŠ¸ ìƒì„± ë° ì „ì†¡ í•¨ìˆ˜
 		CMDummyEvent due = new CMDummyEvent();
-		due.setDummyInfo("¼­¹ö·Î Àü¼ÛÇÏ´Â ¸Ş½ÃÁö");
+		// due.setDummyInfo("ì„œë²„ë¡œ ì „ì†¡í•˜ëŠ” ë©”ì‹œì§€");
 		// due.setID(0);
+		due.setDummyInfo("FileListRequest");
+		due.setID(1);
 		
-		System.out.println("**** [DummyEvent] Å¬¶óÀÌ¾ğÆ® ----> ¼­¹ö  : " + due.getDummyInfo());
-		m_clientStub.send(due,"SERVER"); // ¼­¹ö·Î Àü¼Û	
+		System.out.println("**** [DummyEvent] í´ë¼ì´ì–¸íŠ¸ ----> ì„œë²„  : " + due.getDummyInfo());
+		//m_clientStub.send(due,"SERVER"); // ì„œë²„ë¡œ ì „ì†¡	
 	}
 
-	public void fileEvent() { // ´õ¹ÌÀÌº¥Æ® »ı¼º ¹× Àü¼Û ÇÔ¼ö
+	public void fileEvent() { // ë”ë¯¸ì´ë²¤íŠ¸ ìƒì„± ë° ì „ì†¡ í•¨ìˆ˜
 		CMFileEvent fe = new CMFileEvent();
 		fe.setID(fe.REQUEST_PERMIT_PULL_FILE);
 		
-		System.out.println("**** Å¬¶óÀÌ¾ğÆ® ----> ¼­¹ö : file µ¥ÀÌÅÍ Àü¼Û ¿Ï·á ");
-		m_clientStub.send(fe,"SERVER"); // ¼­¹ö·Î Àü¼Û	
+		System.out.println("**** í´ë¼ì´ì–¸íŠ¸ ----> ì„œë²„ : file ë°ì´í„° ì „ì†¡ ì™„ë£Œ ");
+		m_clientStub.send(fe,"SERVER"); // ì„œë²„ë¡œ ì „ì†¡	
 	}
 
 	public void testSetFilePath()
