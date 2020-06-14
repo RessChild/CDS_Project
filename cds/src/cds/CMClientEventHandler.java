@@ -5,9 +5,16 @@ import java.awt.Desktop;
 import java.awt.desktop.FilesEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMEvent;
@@ -65,31 +72,52 @@ public class CMClientEventHandler implements CMAppEventHandler {
 
 		String[] strs = de.getDummyInfo().split("#"); // 샵을 기준으로 쪼갬
 
-		switch(de.getID()) {
-		case 1:
+		// 등록된 유저 목록 반영
+		if(de.getID() == RequestID.REQ_ALL_USERS) {
+			for(String str: strs) {
+				if(str.isEmpty()) continue;
+				c_user.add(str);
+			}
+		}
+		// 새로 등록된 유저 반영
+		else if(de.getID() == RequestID.REGISTER_USER) {
+			c_user.add(strs[0]);
+			UI.userSwing(c_user);
+			System.out.println("**** 클라이언트 : 신규유저 추가"); // 메시지 출력	
+		}
+		// 선택한 유저의 주석 목록 반영
+		else if(de.getID() == RequestID.REQ_COMMENT) {
+			String msg = de.getDummyInfo();
+			System.out.println("******* [REQ COMMENT EVENT] ********");
+			System.out.println("Message : "+ msg);
+			JSONParser parser = new JSONParser();
+			try {
+				Object obj = parser.parse(msg);
+				JSONObject jsonObj = (JSONObject) obj;
+				JSONArray comments = (JSONArray) jsonObj.get("comments");
+				
+				List<String> userComments = new ArrayList<>();
+				for(int i = 0; i < comments.size(); i++) {
+					userComments.add((String) comments.get(i)); 
+				}
+				for(int i = 0; i < userComments.size(); i++) {
+					System.out.print(userComments.get(i));
+				}
+				System.out.println();
+				
+				
+			} catch (ParseException e1) {
+				e1.printStackTrace();
+			}
+		}
+		// 서버에 저장되어 있는 PDF 파일 목록 가져옴
+		else if(de.getID() == RequestID.FILE_LIST_REQ) {
 			String []fileList = de.getDummyInfo().split("#");
 			for(String file: fileList) {
 				System.out.print(file + ", ");
 			}
 			System.out.println();
 			m_client.showFileList(fileList);
-      break;
-		case 2: // 참가자 정보 입력
-			for(String str: strs) {
-				if(str.isEmpty()) continue;
-				c_user.add(str);
-			}
-			break;
-		case 3: // 주석 정보
-			break;
-		case 4: // 신규 유저 정보
-			c_user.add(strs[0]);
-			UI.userSwing(c_user);
-			System.out.println("**** 클라이언트 : 신규유저 추가"); // 메시지 출력	
-			break;
-		default:
-			System.out.println("******** [DummyEvent] Can't Find to Do");
-			break;
 		}
 		
 		System.out.println(c_user); // 메시지 출력

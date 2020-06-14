@@ -26,6 +26,8 @@ import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.json.simple.JSONObject;
+
 import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
@@ -63,7 +65,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		
 		// 구성 패널 모두 초기화
 		init();
-		
+
 		pack();
 		this.setVisible(true);
 		//여기까지가 창 만들기.
@@ -195,17 +197,36 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 			this.m_clientStub.send(due, "SERVER");
 		} else if(e.getSource() == preBtn) {
 			//pdf 이전 페이지 
-			currPDF.decrementPageNum();
-			pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
+			if(currPDF != null) {
+				currPDF.decrementPageNum();
+				pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
+			}
 			
 		}else if(e.getSource() == nextBtn) {
 			//pdf 다음 페이지
-			currPDF.incrementPageNum();
-			pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
+			if(currPDF != null) {
+				currPDF.incrementPageNum();
+				pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
+			}
 			
 		}else if(e.getSource() == commentBtn) {
 			//주석달기 버튼
 			
+			// 사용자가 오픈한 PDF가 있을 때만 주석 달기 가능
+			if(currPDF != null) {
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("fileName", currPDF.getFileName());
+				jsonObj.put("pageNum", currPDF.getCurrentPageNum());
+				jsonObj.put("comment", note.getText());
+				
+				CMDummyEvent due = new CMDummyEvent();
+				due.setDummyInfo(jsonObj.toString());
+				due.setID(RequestID.ADD_COMMENT);
+				this.m_clientStub.send(due, "SERVER");
+			}
+			else {
+				System.out.println("Open PDF first!!");
+			}
 		}
 	}
 	@Override
@@ -215,6 +236,18 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 			//특정 사용자를 선택하면 해당 사용자가 주석을 달은 부분을 보여준다.
 			//주석을 어디에 저장하는지 몰라서 일단 사용자가 선택하면 해당 사용자이름을 콘솔에 띄움
 			System.out.println(userList.getSelectedValue());
+			String selectedUser = (String) userList.getSelectedValue();
+			
+			if(currPDF != null) {
+				CMDummyEvent due = new CMDummyEvent();
+				
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("fileName", currPDF.getFileName());
+				jsonObj.put("user", selectedUser);
+				due.setDummyInfo(jsonObj.toString());
+				due.setID(RequestID.REQ_COMMENT);
+				this.m_clientStub.send(due, "SERVER");
+			}
 		}
 	}
 	

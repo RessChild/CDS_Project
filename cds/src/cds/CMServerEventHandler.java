@@ -4,10 +4,16 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import kr.ac.konkuk.ccslab.cm.entity.CMSession;
 import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
@@ -23,7 +29,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 	private serverMain m_server = null;
 	private CMServerStub m_serverStub = null;
 	
-	private Vector<ServerPDF> s_pdf; // 타입 선언 필요
+	private HashMap<String, ServerPDF> s_pdf; // <파일 이름, ServerPDF 객체> 형태로 저장
 	private Vector<String> s_user; // 참여자 목록
 	
 	private static int FILE_LIST_REQ_ID = 1;
@@ -33,7 +39,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		m_server = s;
 		m_serverStub = ss;
 		
-		s_pdf = new Vector<ServerPDF>();
+		s_pdf = new HashMap<String, ServerPDF>();
 		s_user = new Vector<String>();
 	}
 	
@@ -82,9 +88,93 @@ public class CMServerEventHandler implements CMAppEventHandler {
 			nde.setDummyInfo(msg.toString());
 			m_serverStub.send(nde, de.getSender());
 		}
-		else 
-    {
-    }
+		else if(de.getID() == RequestID.ADD_COMMENT) {
+			String msg = de.getDummyInfo();
+			System.out.println("******* [ADD COMMENT EVENT] ********");
+			System.out.println("Message : "+ msg);
+			JSONParser parser = new JSONParser();
+			try {
+				Object obj = parser.parse(msg);
+				JSONObject jsonObj = (JSONObject) obj;
+				
+				// 클라이언트에서 보낸 <파일 이름, 페이지 번호, 주석> 데이터 파싱
+				String fileName = (String) jsonObj.get("fileName");
+				int pageNum = ((Long) jsonObj.get("pageNum")).intValue();
+				String comment = (String) jsonObj.get("comment");
+
+				// 파일 이름으로 서버에 해당 파일 있는지 확인
+				ServerPDF req_pdf = s_pdf.get(fileName);
+				
+				if(req_pdf != null) {
+					req_pdf.addComment(de.getSender(), comment, pageNum);
+				}
+				else {
+					// 클라이언트에게 파일 전송 메세지 요청
+					
+				}
+				
+				
+			} catch (ParseException e1) {
+				e1.printStackTrace();
+			}
+			
+		}
+		else if(de.getID() == RequestID.REQ_COMMENT) {
+			String msg = de.getDummyInfo();
+			System.out.println("******* [REQUEST COMMENT EVENT] ********");
+			System.out.println("Message : "+ msg);
+			
+			JSONParser parser = new JSONParser();
+			try {
+				Object obj = parser.parse(msg);
+				JSONObject jsonObj = (JSONObject) obj;
+				
+				// 주석 보려고 하는 <파일 이름, 주석> 데이터 파싱
+				String fileName = (String) jsonObj.get("fileName");
+				String userName = (String) jsonObj.get("user");
+				
+				// 파일 이름으로 서버에 해당 파일 있는지 확인
+				ServerPDF req_pdf = s_pdf.get(fileName);
+				
+				if(req_pdf != null) {
+					String[] comments = req_pdf.getComment(userName);
+					
+					// 요청한 유저가 남겨놓은 주석이 있을 때만 전송
+					if (comments != null) {
+						JSONObject sendJsonObj = new JSONObject();
+						JSONArray jsonArr = new JSONArray();
+						for(String comment : comments) {
+							jsonArr.add(comment);
+						}
+						sendJsonObj.put("comments", jsonArr);
+						
+						CMDummyEvent nde = new CMDummyEvent();
+						nde.setID(RequestID.REQ_COMMENT);
+						nde.setDummyInfo(sendJsonObj.toString());
+						
+						m_serverStub.send(nde, de.getSender());
+					}
+				} else {
+					// 테스트
+					String[] comments = {"Comment from server!!", "new new comment"};
+					JSONObject sendJsonObj = new JSONObject();
+					JSONArray jsonArr = new JSONArray();
+					for(String comment : comments) {
+						jsonArr.add(comment);
+					}
+					sendJsonObj.put("comments", jsonArr);
+					
+					CMDummyEvent nde = new CMDummyEvent();
+					nde.setID(RequestID.REQ_COMMENT);
+					nde.setDummyInfo(sendJsonObj.toString());
+					
+					m_serverStub.send(nde, de.getSender());
+				}
+			}
+			catch (ParseException e1) {
+				e1.printStackTrace();
+			}
+		}
 
 		/*
 		 		CMDummyEvent nde = new CMDummyEvent();
@@ -140,8 +230,9 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		switch (se.getID()) {
 		case CMSessionEvent.LOGIN:	// 1번 이벤트
 			CMDummyEvent nde = new CMDummyEvent();
+			nde.setID(RequestID.REQ_ALL_USERS);
+			
 			StringBuilder sb = new StringBuilder();
-			nde.setID(2);
 			for (String user : s_user) { // 모든 파일의 이름을 문자열로 변환
 				sb.append(user + "#");
 			}
@@ -152,7 +243,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 			if(!s_user.contains(se.getSender())) { // 사용자 이름 추가
 				s_user.add(se.getSender());
 				CMDummyEvent nde2 = new CMDummyEvent();
-				nde2.setID(4); // 새로운 인원이 추가됨
+				nde2.setID(RequestID.REGISTER_USER); // 새로운 인원이 추가됨
 				nde2.setDummyInfo(se.getSender());
 				m_serverStub.broadcast(nde2); // 메시지 전송
 				System.out.println("******************** [로그인] 신규 유저 정보 전송");
@@ -227,18 +318,6 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		bReturn = m_serverStub.pushFile(strFilePath, who, byteFileAppendMode);
 		if (!bReturn) {
 			System.out.println("*************** 파일 전송 에러! **************");
-		}
-	}
-	
-	private void processSessionEvent(CMEvent cme) {
-		CMSessionEvent se = (CMSessionEvent) cme;
-		switch(se.getID()) 
-		{
-		case CMSessionEvent.LOGIN:
-			System.out.println(se.getUserName() + " requested login");
-			break;
-		default:
-			return;
 		}
 	}
 }

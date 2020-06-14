@@ -77,4 +77,12 @@ public class Pdf {
 			currPageNum++;
 		}
 	}
+	
+	public String getFileName() {
+		return this.pdfFile.getName();
+	}
+	
+	public int getCurrentPageNum() {
+		return this.currPageNum;
+	}
 }

@@ -35,6 +35,10 @@ public class ServerPDF {
 		}
 	}
 	
+	public String[] getComment(String userName) {
+		return comments.get(userName);
+	}
+	
 	
 }
 
