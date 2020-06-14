@@ -11,19 +11,19 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 
 public class Pdf {
 	
-	// PDF ÆÄÀÏ °æ·Î
+	// PDF íŒŒì¼ ê²½ë¡œ
 	private String filePath;
 	
-	// ºÒ·¯¿Â PDF ÆÄÀÏ °´Ã¼
+	// ë¶ˆëŸ¬ì˜¨ PDF íŒŒì¼ ê°ì²´
 	private File pdfFile;
 	
 	private PDDocument doc;
 	private PDFRenderer renderer;
 	
-	// PDF ÆäÀÌÁö¸¦ ÀÌ¹ÌÁö·Î ·»´õ¸µÇØ¼­ ÀúÀåÇÏ±â À§ÇÑ ¸®½ºÆ®
+	// PDF í˜ì´ì§€ë¥¼ ì´ë¯¸ì§€ë¡œ ë Œë”ë§í•´ì„œ ì €ì¥í•˜ê¸° ìœ„í•œ ë¦¬ìŠ¤íŠ¸
 	private List<BufferedImage> pageImgs;
 	
-	// ÇöÀç »ç¿ëÀÚ°¡ º¸°í ÀÖ´Â ÆäÀÌÁö
+	// í˜„ì¬ ì‚¬ìš©ìê°€ ë³´ê³  ìˆëŠ” í˜ì´ì§€
 	private int currPageNum;
 	
 	public Pdf(String filePath) {
@@ -53,7 +53,7 @@ public class Pdf {
 		renderer = new PDFRenderer(doc);
 		for (int i = 0; i < doc.getNumberOfPages(); i++) {
 			try {
-				// °¢ PDF ÆäÀÌÁö¸¦ ÀÌ¹ÌÁö·Î ·»´õ¸µÇØ¼­ ¸®½ºÆ®¿¡ Ãß°¡
+				// ê° PDF í˜ì´ì§€ë¥¼ ì´ë¯¸ì§€ë¡œ ë Œë”ë§í•´ì„œ ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€
 				pageImgs.add(renderer.renderImage(i));
 			} catch (IOException e) {
 				System.err.println("Failed to render pdf to image");

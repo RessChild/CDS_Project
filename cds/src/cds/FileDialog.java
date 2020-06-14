@@ -50,8 +50,8 @@ public class FileDialog extends JDialog implements ActionListener, ListSelection
 			public void windowClosing(WindowEvent e) {
 				// TODO Auto-generated method stub
 				super.windowClosing(e);
-				UI.dialog = null;//parent°¡ °¡Áø dialog¸¦ null
-				dispose();//Ã¢À» ´İ´Â´Ù.
+				UI.dialog = null;//parentê°€ ê°€ì§„ dialogë¥¼ null
+				dispose();//ì°½ì„ ë‹«ëŠ”ë‹¤.
 			}
 		});
 		
@@ -73,8 +73,8 @@ public class FileDialog extends JDialog implements ActionListener, ListSelection
 	public void valueChanged(ListSelectionEvent e) {
 		// TODO Auto-generated method stub
 		if(!e.getValueIsAdjusting()) {
-			//Æ¯Á¤ »ç¿ëÀÚ¸¦ ¼±ÅÃÇÏ¸é ÇØ´ç »ç¿ëÀÚ°¡ ÁÖ¼®À» ´ŞÀº ºÎºĞÀ» º¸¿©ÁØ´Ù.
-			//ÁÖ¼®À» ¾îµğ¿¡ ÀúÀåÇÏ´ÂÁö ¸ô¶ó¼­ ÀÏ´Ü »ç¿ëÀÚ°¡ ¼±ÅÃÇÏ¸é ÇØ´ç »ç¿ëÀÚÀÌ¸§À» ÄÜ¼Ö¿¡ ¶ç¿ò
+			//íŠ¹ì • ì‚¬ìš©ìë¥¼ ì„ íƒí•˜ë©´ í•´ë‹¹ ì‚¬ìš©ìê°€ ì£¼ì„ì„ ë‹¬ì€ ë¶€ë¶„ì„ ë³´ì—¬ì¤€ë‹¤.
+			//ì£¼ì„ì„ ì–´ë””ì— ì €ì¥í•˜ëŠ”ì§€ ëª°ë¼ì„œ ì¼ë‹¨ ì‚¬ìš©ìê°€ ì„ íƒí•˜ë©´ í•´ë‹¹ ì‚¬ìš©ìì´ë¦„ì„ ì½˜ì†”ì— ë„ì›€
 			this.selectedFile = List.getSelectedValue().toString();
 		}
 	}

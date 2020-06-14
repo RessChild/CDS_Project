@@ -37,12 +37,12 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	JButton ServerFileButton, LocalFileButton, nextBtn, preBtn, commentBtn;
 	JList userList;
 	JLabel fileLabel;
-	JTextArea note;//ÀÏ´Ü ½ÇÁ¦ pdf´ë½Å textArea·Î ³õ´Â´Ù
+	JTextArea note;//ì¼ë‹¨ ì‹¤ì œ pdfëŒ€ì‹  textAreaë¡œ ë†“ëŠ”ë‹¤
 	JLabel pdf;
 	FileDialog dialog;
 	CMClientStub m_clientStub;
 	CMClientEventHandler m_eventHandler;
-	// »ç¿ëÀÚ°¡ ºÒ·¯¿Â PDF ÆäÀÌÁö º° ÀÌ¹ÌÁö ¹× ÆÄÀÏ Á¤º¸ ÀúÀåÇÏ°í ÀÖ´Â °´Ã¼
+	// ì‚¬ìš©ìê°€ ë¶ˆëŸ¬ì˜¨ PDF í˜ì´ì§€ ë³„ ì´ë¯¸ì§€ ë° íŒŒì¼ ì •ë³´ ì €ì¥í•˜ê³  ìˆëŠ” ê°ì²´
 	Pdf currPDF;
 	String selectedFile;
 	
@@ -51,26 +51,26 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		setTitle(title);
 		this.m_clientStub = m_clientStub;
 		this.m_eventHandler = m_eventHandler;
-		Toolkit kit = this.getToolkit();//½Ã½ºÅÛ Á¤º¸¸¦ °¡Á®¿È, AWT¿¡ ÀÖ´Ù.
-		Dimension screenSize= kit.getScreenSize();//¹İÈ¯°ªÀÌ Dimension(Æø°ú ³ôÀÌÁ¤º¸¸¦ °¡Áø ÇÏ³ªÀÇ Å¸ÀÔ)
+		Toolkit kit = this.getToolkit();//ì‹œìŠ¤í…œ ì •ë³´ë¥¼ ê°€ì ¸ì˜´, AWTì— ìˆë‹¤.
+		Dimension screenSize= kit.getScreenSize();//ë°˜í™˜ê°’ì´ Dimension(í­ê³¼ ë†’ì´ì •ë³´ë¥¼ ê°€ì§„ í•˜ë‚˜ì˜ íƒ€ì…)
 		this.screenWidth = screenSize.width;
 		this.screenHeight = screenSize.height;
-		this.setLocation(100, 100);// Ã¢À» ¾îµğ¿¡ »ı¼ºµÇ°Ô ÇÒ°ÍÀÎ°¡?
+		this.setLocation(100, 100);// ì°½ì„ ì–´ë””ì— ìƒì„±ë˜ê²Œ í• ê²ƒì¸ê°€?
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		// ±¸¼º ÆĞ³Î ¸ğµÎ ÃÊ±âÈ­
+		// êµ¬ì„± íŒ¨ë„ ëª¨ë‘ ì´ˆê¸°í™”
 		init();
 		
 		pack();
 		this.setVisible(true);
-		//¿©±â±îÁö°¡ Ã¢ ¸¸µé±â.
+		//ì—¬ê¸°ê¹Œì§€ê°€ ì°½ ë§Œë“¤ê¸°.
 	}
 	
 	public void fileSwing() {
 		filePanel = new JPanel(new BorderLayout());
 		fileButtonPanel = new JPanel(new FlowLayout());
-		ServerFileButton = new JButton("¼­¹ö¿¡¼­ ÆÄÀÏ ¼±ÅÃ");
-		LocalFileButton = new JButton("·ÎÄÃ¿¡¼­ ÆÄÀÏ ¼±ÅÃ");
+		ServerFileButton = new JButton("ì„œë²„ì—ì„œ íŒŒì¼ ì„ íƒ");
+		LocalFileButton = new JButton("ë¡œì»¬ì—ì„œ íŒŒì¼ ì„ íƒ");
 		fileLabel = new JLabel();
 		fileButtonPanel.add(LocalFileButton);
 		fileButtonPanel.add(ServerFileButton);
@@ -83,21 +83,21 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	public void pdfSwing() {
 		pdfPanel = new JPanel(new GridBagLayout());
 		
-		// PDF ÆĞ³Î ºÎºĞ Å©±â °íÁ¤ÇØ¾ß
-		// PDF ÀÌ¹ÌÁö Å©±â µû¶ó¼­ Ã¢ Å©±â ¿Ô´Ù°¬´Ù ÇÏÁö ¾Ê
+		// PDF íŒ¨ë„ ë¶€ë¶„ í¬ê¸° ê³ ì •í•´ì•¼
+		// PDF ì´ë¯¸ì§€ í¬ê¸° ë”°ë¼ì„œ ì°½ í¬ê¸° ì™”ë‹¤ê°”ë‹¤ í•˜ì§€ ì•Š
 		pdfPanel.setPreferredSize(new Dimension(1024, this.screenHeight));
 		
-		// GridBagLayout Cell º°·Î ¼Ó¼º Á¤ÀÇÇÏ´Â º¯¼ö ÃÊ±âÈ­
+		// GridBagLayout Cell ë³„ë¡œ ì†ì„± ì •ì˜í•˜ëŠ” ë³€ìˆ˜ ì´ˆê¸°í™”
 		GridBagConstraints[] gbc = new GridBagConstraints[3];
 		for(int i = 0; i < 3; i++) {
 			gbc[i] = new GridBagConstraints();
 		}
 		
-		// PDF º¸¿©ÁÖ´Â ÆĞ³Î ±¸¼º
+		// PDF ë³´ì—¬ì£¼ëŠ” íŒ¨ë„ êµ¬ì„±
 		pdf = new JLabel();
 		pdfImgPanel = new JScrollPane(pdf);
 		
-		//PDF ÆĞ³ÎÀÌ °¡Àå À§¿¡ À§Ä¡
+		//PDF íŒ¨ë„ì´ ê°€ì¥ ìœ„ì— ìœ„ì¹˜
 		gbc[0].gridx = 0;
 		gbc[0].gridy = 0;
 		gbc[0].fill = GridBagConstraints.BOTH;
@@ -105,9 +105,9 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		gbc[0].weighty = 0.6;
 		
 		
-		// PDF ÆäÀÌÁö ³Ñ°ÜÁÖ´Â ¹öÆ° ÆĞ³Î ±¸¼º
-		preBtn = new JButton("ÀÌÀü");
-		nextBtn = new JButton("´ÙÀ½");
+		// PDF í˜ì´ì§€ ë„˜ê²¨ì£¼ëŠ” ë²„íŠ¼ íŒ¨ë„ êµ¬ì„±
+		preBtn = new JButton("ì´ì „");
+		nextBtn = new JButton("ë‹¤ìŒ");
 		
 		ButtonPanel = new JPanel(new FlowLayout());
 		ButtonPanel.add(preBtn);
@@ -115,7 +115,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		gbc[1].gridx = 0;
 		gbc[1].gridy = 1;
 		
-		// ÁÖ¼® ÆĞ³Î ±¸¼º
+		// ì£¼ì„ íŒ¨ë„ êµ¬ì„±
 		note = new JTextArea("COMMENT", 10, 40);
 		noteJSP = new JScrollPane(note, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		gbc[2].gridx = 0;
@@ -134,13 +134,13 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	public void userSwing() {
 		userPanel = new JPanel(new BorderLayout());
 		String[] users = {"user1", "user2", "user3"};
-		//users ¸®½ºÆ®¿¡ ÇöÀç »ç¿ëÀÚ¸¦ ³Ö´Â °úÁ¤
+		//users ë¦¬ìŠ¤íŠ¸ì— í˜„ì¬ ì‚¬ìš©ìë¥¼ ë„£ëŠ” ê³¼ì •
 		userList = new JList(users);
 		
 		userList.addListSelectionListener(this);
 		userPanel.add(userList, BorderLayout.NORTH);
 
-		commentBtn = new JButton("ÁÖ¼®´Ş±â");
+		commentBtn = new JButton("ì£¼ì„ë‹¬ê¸°");
 		userPanel.add(commentBtn, BorderLayout.SOUTH);
 		frame.add(userPanel, BorderLayout.EAST);
 	}
@@ -155,7 +155,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		
 		userSwing();
 		
-		// ¹öÆ° Å¬¸¯ ¸®½º³Ê Ãß°¡
+		// ë²„íŠ¼ í´ë¦­ ë¦¬ìŠ¤ë„ˆ ì¶”ê°€
 		LocalFileButton.addActionListener(this);
 		ServerFileButton.addActionListener(this);
 		preBtn.addActionListener(this);
@@ -166,37 +166,37 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == LocalFileButton) {
-			//·ÎÄÃÀÇ pdf ÆÄÀÏÀ» ºÒ·¯ ¿Ã¼ö ÀÖ´Ù.
+			//ë¡œì»¬ì˜ pdf íŒŒì¼ì„ ë¶ˆëŸ¬ ì˜¬ìˆ˜ ìˆë‹¤.
 			JFileChooser filedlg = new JFileChooser();
-			int result = filedlg.showOpenDialog(this);//int¸¦ ¹İÈ¯, ok or cancel
+			int result = filedlg.showOpenDialog(this);//intë¥¼ ë°˜í™˜, ok or cancel
 			if(result == JFileChooser.APPROVE_OPTION) {
-				//»ç¿ëÀÚ°¡ ¿­±â¿¡ ÇØ´çÇÏ´Â ¹öÆ°À» ´­·¶´Ù¸é.
+				//ì‚¬ìš©ìê°€ ì—´ê¸°ì— í•´ë‹¹í•˜ëŠ” ë²„íŠ¼ì„ ëˆŒë €ë‹¤ë©´.
 				File file = filedlg.getSelectedFile();
 				String path = file.getPath();
 				fileLabel.setText(path);
 				
-				//pdf¸¦ ¶ç¿ì´Â ºÎºĞ
+				//pdfë¥¼ ë„ìš°ëŠ” ë¶€ë¶„
 				currPDF = new Pdf(path);
 				pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 			}
 		}else if(e.getSource() == ServerFileButton) {
-			//¼­¹ö¿¡¼­ pdfÆÄÀÏÀ» ºÒ·¯¿È
+			//ì„œë²„ì—ì„œ pdfíŒŒì¼ì„ ë¶ˆëŸ¬ì˜´
 			CMDummyEvent due = new CMDummyEvent();
 			due.setDummyInfo("FileListRequest");
 			due.setID(1);
 			this.m_clientStub.send(due, "SERVER");
 		} else if(e.getSource() == preBtn) {
-			//pdf ÀÌÀü ÆäÀÌÁö 
+			//pdf ì´ì „ í˜ì´ì§€ 
 			currPDF.decrementPageNum();
 			pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 			
 		}else if(e.getSource() == nextBtn) {
-			//pdf ´ÙÀ½ ÆäÀÌÁö
+			//pdf ë‹¤ìŒ í˜ì´ì§€
 			currPDF.incrementPageNum();
 			pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 			
 		}else if(e.getSource() == commentBtn) {
-			//ÁÖ¼®´Ş±â ¹öÆ°
+			//ì£¼ì„ë‹¬ê¸° ë²„íŠ¼
 			
 		}
 	}
@@ -204,8 +204,8 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	public void valueChanged(ListSelectionEvent e) {
 		// TODO Auto-generated method stub
 		if(!e.getValueIsAdjusting()) {
-			//Æ¯Á¤ »ç¿ëÀÚ¸¦ ¼±ÅÃÇÏ¸é ÇØ´ç »ç¿ëÀÚ°¡ ÁÖ¼®À» ´ŞÀº ºÎºĞÀ» º¸¿©ÁØ´Ù.
-			//ÁÖ¼®À» ¾îµğ¿¡ ÀúÀåÇÏ´ÂÁö ¸ô¶ó¼­ ÀÏ´Ü »ç¿ëÀÚ°¡ ¼±ÅÃÇÏ¸é ÇØ´ç »ç¿ëÀÚÀÌ¸§À» ÄÜ¼Ö¿¡ ¶ç¿ò
+			//íŠ¹ì • ì‚¬ìš©ìë¥¼ ì„ íƒí•˜ë©´ í•´ë‹¹ ì‚¬ìš©ìê°€ ì£¼ì„ì„ ë‹¬ì€ ë¶€ë¶„ì„ ë³´ì—¬ì¤€ë‹¤.
+			//ì£¼ì„ì„ ì–´ë””ì— ì €ì¥í•˜ëŠ”ì§€ ëª°ë¼ì„œ ì¼ë‹¨ ì‚¬ìš©ìê°€ ì„ íƒí•˜ë©´ í•´ë‹¹ ì‚¬ìš©ìì´ë¦„ì„ ì½˜ì†”ì— ë„ì›€
 			System.out.println(userList.getSelectedValue());
 		}
 	}

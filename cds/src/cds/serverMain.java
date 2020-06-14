@@ -24,7 +24,7 @@ public class serverMain {
 	private CMServerEventHandler m_eventHandler;
 	private CMServerStub m_serverStub;
 	
-	public serverMain() { // °´Ã¼ »ı¼º
+	public serverMain() { // ê°ì²´ ìƒì„±
 		m_serverStub = new CMServerStub();
 		m_eventHandler = new CMServerEventHandler(this, m_serverStub);
 	}
@@ -33,15 +33,15 @@ public class serverMain {
 		serverMain server = new serverMain();
 		server.m_serverStub.setAppEventHandler(server.m_eventHandler);
 		
-		server.m_serverStub.startCM(); // ¼­¹ö µ¹¸®±â ½ÃÀÛ
-		System.out.println("Server ½ÇÇà Áß");
+		server.m_serverStub.startCM(); // ì„œë²„ ëŒë¦¬ê¸° ì‹œì‘
+		System.out.println("Server ì‹¤í–‰ ì¤‘");
 		
 	}
 	
-	// ÆÄÀÏ°ü·Ã ÇÔ¼ö
+	// íŒŒì¼ê´€ë ¨ í•¨ìˆ˜
 	public void setFilePath()
 	{
-		// ÆÄÀÏ °æ·Î ¼¼ÆÃ 
+		// íŒŒì¼ ê²½ë¡œ ì„¸íŒ… 
 		String strPath = null;
 
 		strPath = JOptionPane.showInputDialog("file path: ");
@@ -54,7 +54,7 @@ public class serverMain {
 		
 	}
 
-	public void pushFile() // ÆÄÀÏ Çª½Ã
+	public void pushFile() // íŒŒì¼ í‘¸ì‹œ
 	{
 		String strFilePath = null;
 		File files;
@@ -71,16 +71,16 @@ public class serverMain {
 		fc.setCurrentDirectory(curDir);
 		int fcRet = fc.showOpenDialog(this);
 		if(fcRet != JFileChooser.APPROVE_OPTION) return;
-		files = fc.getSelectedFiles(); // ¿©±â¼­ ÆÄÀÏ ¼±ÅÃ ±¸¹®ÀÎµ¥..
+		files = fc.getSelectedFiles(); // ì—¬ê¸°ì„œ íŒŒì¼ ì„ íƒ êµ¬ë¬¸ì¸ë°..
 		 */
 
 		
 		files = new File("./server-file-path/test.pdf");
 		
 		strFilePath = files.getPath();
-		bReturn = m_serverStub.pushFile(strFilePath, "º¸³¾ ´ë»ó ÀÌ¸§", byteFileAppendMode);
+		bReturn = m_serverStub.pushFile(strFilePath, "ë³´ë‚¼ ëŒ€ìƒ ì´ë¦„", byteFileAppendMode);
 		if (!bReturn) {
-			System.out.println("*************** ÆÄÀÏ Àü¼Û ¿¡·¯! **************");
+			System.out.println("*************** íŒŒì¼ ì „ì†¡ ì—ëŸ¬! **************");
 		}
 	}
 }
