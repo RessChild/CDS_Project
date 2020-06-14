@@ -34,7 +34,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
 	private UserInterface UI;
 	
 	private File c_pdf = null; // 현재 사용중인 파일
-	private int c_fnum = -1; // 선택한 파일의 인덱스 번호
+	private String c_fname; // 선택한 파일 명
 	private Vector<String> c_user; // pdf 참여자 정보
 	private String c_content = null; // 현재 페이지의 기록
 	
@@ -72,20 +72,22 @@ public class CMClientEventHandler implements CMAppEventHandler {
 		CMDummyEvent de = (CMDummyEvent) e; // 이벤트 형변환
 
 		System.out.println("**** 클라이언트 측 수신 메시지 : " + de.getDummyInfo()); // 메시지 출력
-		String[] strs = de.getDummyInfo().split("#"); // 샵을 기준으로 쪼갬
 
 		// 등록된 유저 목록 반영
 		if(de.getID() == RequestID.REQ_ALL_USERS) {
+			String[] strs = de.getDummyInfo().split("#"); // 샵을 기준으로 쪼갬
 			for(String str: strs) {
 				if(str.isEmpty()) continue;
 				c_user.add(str);
 			}
+			System.out.println(c_user); // 메시지 출력
 		}
 		// 새로 등록된 유저 반영
 		else if(de.getID() == RequestID.REGISTER_USER) {
-			c_user.add(strs[0]);
+			c_user.add(de.getDummyInfo());
 			UI.userSwing(c_user);
 			System.out.println("**** 클라이언트 : 신규유저 추가"); // 메시지 출력	
+			System.out.println(c_user); // 메시지 출력
 		}
 		// 선택한 유저의 주석 목록 반영
 		else if(de.getID() == RequestID.REQ_COMMENT) {
@@ -119,14 +121,22 @@ public class CMClientEventHandler implements CMAppEventHandler {
 				System.out.print(file + ", ");
 			}
 			System.out.println();
-			if(fileList[0] != "")
+			if(fileList[0] != "") {
 				m_client.showFileList(fileList);
+
+//				c_fname = UI.returnSelect();
+//				System.out.println(c_fname);
+				// 이 부분이 리스너처럼 작동해야 함..
+				// 메시지를 보내나?
+			}
 			else {
 				System.out.println("아직 서버 내에 파일이 없어요");
 			}
 		}
-		
-		System.out.println(c_user); // 메시지 출력
+		else if (de.getID() == RequestID.SELECT_SERVER_FILE) {
+			c_fname = de.getDummyInfo();
+			System.out.println("[클라이언트] 선택한 파일 : "+ c_fname);
+		}
 	}
 		
 	// 여기서 파일 전송요청에 대한 push 허가 정보를 내보내야 함..

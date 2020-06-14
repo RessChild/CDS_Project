@@ -61,6 +61,7 @@ public class FileDialog extends JDialog implements ActionListener, ListSelection
 		// TODO Auto-generated method stub
 		if(e.getSource() == confirm) {
 			UI.selectedFile = this.selectedFile;
+			UI.sendSelect(this.selectedFile);
 			UI.dialog = null;
 			dispose();
 		}else if(e.getSource() == cancel) {

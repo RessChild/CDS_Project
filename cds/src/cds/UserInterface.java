@@ -52,6 +52,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	Pdf currPDF;
 	String selectedFile;
 	Vector<String> user;
+	String userName;
 	
 	UserInterface(String title, CMClientStub m_clientStub) {
 		this.m_clientStub = m_clientStub;
@@ -69,6 +70,10 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		pack();
 		this.setVisible(true);
 		//여기까지가 창 만들기.
+	}
+	
+	public void setUser(String s) {
+		this.userName = s;
 	}
 	
 	public void fileSwing() {
@@ -271,5 +276,16 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 			System.out.println("*************** 파일 전송 에러! **************");
 			System.out.println("이미 파일이 존재할 수 있어요");
 		}
+	}
+	
+	public void sendSelect(String fname) {
+		CMDummyEvent de = new CMDummyEvent();
+		de.setDummyInfo(fname);
+		de.setID(RequestID.SELECT_SERVER_FILE);
+		m_clientStub.send(de, this.userName);
+	}
+	
+	public String returnSelect() {
+		return this.selectedFile;
 	}
 }

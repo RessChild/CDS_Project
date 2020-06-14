@@ -52,6 +52,7 @@ public class clientMain {
 		
 		if (client.userName != null) {
 			client.m_clientStub.loginCM(client.userName, "");
+			client.UI.setUser(client.userName);
 		}
 				
 		// CMDummyEvent 객체를 만들어서 전송
