@@ -52,7 +52,6 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	
 	UserInterface(String title, CMClientStub m_clientStub,
 	   CMClientEventHandler m_eventHandler) {
-		setTitle(title);
 		this.m_clientStub = m_clientStub;
 		this.m_eventHandler = m_eventHandler;
 		this.user = new Vector<>();
@@ -122,6 +121,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		
 		// 주석 패널 구성
 		note = new JTextArea("COMMENT", 10, 40);
+		note.setEditable(false);
 		noteJSP = new JScrollPane(note, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		gbc[2].gridx = 0;
 		gbc[2].gridy = 2;
@@ -247,6 +247,9 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 				due.setDummyInfo(jsonObj.toString());
 				due.setID(RequestID.REQ_COMMENT);
 				this.m_clientStub.send(due, "SERVER");
+			}
+			if(userList.getSelectedValue().equals(m_clientStub.getMyself().getName())) {
+				note.setEditable(true);
 			}
 		}
 	}
