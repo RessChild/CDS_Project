@@ -4,20 +4,19 @@ import java.io.File;
 import java.util.HashMap;
 
 public class ServerPDF {
-	
+
 	private String fileName;
-	
-	private File file;
-	
+	private File file;	
 	private int pageNum;
-	
 	private HashMap<String, String[]> comments;
 	
 	public ServerPDF(String fileName, File file, int pageNum) {
 		this.fileName = fileName;
 		this.file = file;
 		this.pageNum = pageNum;
+		this.comments = new HashMap<>();
 	}
+
 	
 	public String getFileName() {
 		return this.fileName;
@@ -38,3 +37,4 @@ public class ServerPDF {
 	
 	
 }
+

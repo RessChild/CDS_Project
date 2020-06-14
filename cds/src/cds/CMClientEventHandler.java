@@ -1,5 +1,5 @@
 package cds;
-// CMAppEventHandler ÀÎÅÍÆäÀÌ½º¸¦ Á¤ÀÇÇÏ´Â ÇÚµé·¯
+// CMAppEventHandler ì¸í„°í˜ì´ìŠ¤ë¥¼ ì •ì˜í•˜ëŠ” í•¸ë“¤ëŸ¬
 
 import java.awt.Desktop;
 import java.awt.desktop.FilesEvent;
@@ -23,22 +23,25 @@ public class CMClientEventHandler implements CMAppEventHandler {
 
 	private clientMain m_client = null;
 	private CMClientStub m_clientStub = null;
-
-	private File c_pdf = null; // Å¸ÀÔ ¼±¾ğ ÇÊ¿ä
-	private Vector<String> c_user = null; // pdf Âü¿©ÀÚ Á¤º¸
-	private Vector<Vector<String>> c_content = null; // °¢ ÆäÀÌÁöº° Å¸ »ç¿ëÀÚÀÇ ±â·Ï
-	private Vector<String> c_history = null; // ÇöÀç »ç¿ëÀÚÀÇ ÆäÀÌÁöº° ±â·Ï
+	private UserInterface UI;
 	
-	public CMClientEventHandler(clientMain c, CMClientStub cs) {
+	private File c_pdf = null; // í˜„ì¬ ì‚¬ìš©ì¤‘ì¸ íŒŒì¼
+	private int c_fnum = -1; // ì„ íƒí•œ íŒŒì¼ì˜ ì¸ë±ìŠ¤ ë²ˆí˜¸
+	private Vector<String> c_user; // pdf ì°¸ì—¬ì ì •ë³´
+	private String c_content = null; // í˜„ì¬ í˜ì´ì§€ì˜ ê¸°ë¡
+	
+	public CMClientEventHandler(clientMain c, CMClientStub cs, UserInterface ui) {
 		// TODO Auto-generated constructor stub
 		m_client = c;
 		m_clientStub = cs;
+		UI = ui;
+		c_user = new Vector<String>();
 	}
 	
 	@Override
 	public void processEvent(CMEvent arg0) {
 		// TODO Auto-generated method stub
-		switch(arg0.getType()) { // ÀÌº¥Æ® Ã³¸®
+		switch(arg0.getType()) { // ì´ë²¤íŠ¸ ì²˜ë¦¬
 		case CMInfo.CM_DUMMY_EVENT:
 			dummyEvent(arg0);
 			break;
@@ -52,12 +55,14 @@ public class CMClientEventHandler implements CMAppEventHandler {
 	}
 
 	public void dummyEvent(CMEvent e) {
-		CMDummyEvent de = (CMDummyEvent) e; // ÀÌº¥Æ® Çüº¯È¯
-		System.out.println("**** Å¬¶óÀÌ¾ğÆ® Ãø ¼ö½Å ¸Ş½ÃÁö (½Ã°£) : " + de.getDummyInfo()); // ¸Ş½ÃÁö Ãâ·Â
-		
+		CMDummyEvent de = (CMDummyEvent) e; // ì´ë²¤íŠ¸ í˜•ë³€í™˜
+
+		System.out.println("**** í´ë¼ì´ì–¸íŠ¸ ì¸¡ ìˆ˜ì‹  ë©”ì‹œì§€ : " + de.getDummyInfo()); // ë©”ì‹œì§€ ì¶œë ¥
+
+		String[] strs = de.getDummyInfo().split("#"); // ìƒµì„ ê¸°ì¤€ìœ¼ë¡œ ìª¼ê°¬
+
 		switch(de.getID()) {
-		case 0:
-			break;
+		case 1: // ë³´ìœ ì¤‘ì¸ íŒŒì¼ ë¦¬ìŠ¤íŠ¸ ë°˜í™˜
 		case 1:
 			String []fileList = de.getDummyInfo().split("#");
 			for(String file: fileList) {
@@ -65,21 +70,34 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			}
 			System.out.println();
 			m_client.showFileList(fileList);
+      break;
+		case 2: // ì°¸ê°€ì ì •ë³´ ì…ë ¥
+			for(String str: strs) {
+				if(str.isEmpty()) continue;
+				c_user.add(str);
+			}
 			break;
-		case 2:
+		case 3: // ì£¼ì„ ì •ë³´
+			break;
+		case 4: // ì‹ ê·œ ìœ ì € ì •ë³´
+			c_user.add(strs[0]);
+			System.out.println("**** í´ë¼ì´ì–¸íŠ¸ : ì‹ ê·œìœ ì € ì¶”ê°€"); // ë©”ì‹œì§€ ì¶œë ¥	
 			break;
 		default:
 			System.out.println("******** [DummyEvent] Can't Find to Do");
+			break;
 		}
+		
+		System.out.println(c_user); // ë©”ì‹œì§€ ì¶œë ¥
 	}
 	
 	public void fileEvent(CMEvent e) {
 		CMFileEvent fe = (CMFileEvent) e;
-		System.out.print("**** Å¬¶óÀÌ¾ğÆ® ¼ö½Å ÆÄÀÏ : " + fe.getFileBlock().toString());
+		System.out.print("**** í´ë¼ì´ì–¸íŠ¸ ìˆ˜ì‹  íŒŒì¼ : " + fe.getFileBlock().toString());
 	}
 	
 	
-	// ¿©±â¼­ ÆÄÀÏ Àü¼Û¿äÃ»¿¡ ´ëÇÑ push Çã°¡ Á¤º¸¸¦ ³»º¸³»¾ß ÇÔ..
+	// ì—¬ê¸°ì„œ íŒŒì¼ ì „ì†¡ìš”ì²­ì— ëŒ€í•œ push í—ˆê°€ ì •ë³´ë¥¼ ë‚´ë³´ë‚´ì•¼ í•¨..
 	private void processFileEvent(CMEvent cme)
 	{
 		CMFileEvent fe = (CMFileEvent) cme;
@@ -98,7 +116,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			strReqBuf.append("file size: "+fe.getFileSize()+"\n");
 			System.out.println(strReqBuf.toString());
 			
-			m_clientStub.replyEvent(fe, 1); // 1ÀÌ¸é Âù¼º 0ÀÌ¸é °ÅÀı			
+			m_clientStub.replyEvent(fe, 1); // 1ì´ë©´ ì°¬ì„± 0ì´ë©´ ê±°ì ˆ			
 			break;
 		}
 		return;
