@@ -29,64 +29,66 @@ public class clientMain {
 	String userName;
 	UserInterface UI;
 
-  public clientMain() { // 객체 생성
-  /*
+  public clientMain() { // 媛앹껜 �깮�꽦
+ 
 		m_clientStub = new CMClientStub();
 		m_eventHandler = new CMClientEventHandler(this, m_clientStub);
 		UI = new UserInterface("test", m_clientStub, m_eventHandler);
-*/
-
+		m_eventHandler.setUI(UI);
+		
+		/*
 		m_clientStub = new CMClientStub();
 		UI = new UserInterface("test");
 		m_eventHandler = new CMClientEventHandler(this, m_clientStub, UI);
+		*/
 		userName = null;
 	}
 	
 	public static void main(String[] args) {
 		clientMain client = new clientMain();
 
-		// CM Stub 에 이벤트 핸들러 등록
+		// CM Stub �뿉 �씠踰ㅽ듃 �빖�뱾�윭 �벑濡�
 		client.m_clientStub.setAppEventHandler(client.m_eventHandler);
 		client.getLoginInfo();
-		client.m_clientStub.startCM(); // 실행
+		client.m_clientStub.startCM(); // �떎�뻾
 		
 		if (client.userName != null) {
 			client.m_clientStub.loginCM(client.userName, "");
 		}
 				
-		// CMDummyEvent 객체를 만들어서 전송
-		// 메시지를 실제로 보내는건 Stub 내의 cast 함수로 전송 가능
-		// 이때, 본인 정보가 필요한데, 이건 CM 내에 info 객체로 CMUser 란 객체로 받아 알 수 있음
+		// CMDummyEvent 媛앹껜瑜� 留뚮뱾�뼱�꽌 �쟾�넚
+		// 硫붿떆吏�瑜� �떎�젣濡� 蹂대궡�뒗嫄� Stub �궡�쓽 cast �븿�닔濡� �쟾�넚 媛��뒫
+		// �씠�븣, 蹂몄씤 �젙蹂닿� �븘�슂�븳�뜲, �씠嫄� CM �궡�뿉 info 媛앹껜濡� CMUser �� 媛앹껜濡� 諛쏆븘 �븣 �닔 �엳�쓬
 		
 
 		//client.dummyEvent("message");
 //		client.dummyEvent();
 
 		
-		System.out.println("클라이언트 실행 중");
+		System.out.println("�겢�씪�씠�뼵�듃 �떎�뻾 以�");
 	}
 	
 	public void showFileList(String[] fileList) {
 		UI.dialog = new FileDialog(UI, fileList);
 	}
 	
-	public void dummyEvent(String message) { // 더미이벤트 생성 및 전송 함수
+	public void dummyEvent(String message) { // �뜑誘몄씠踰ㅽ듃 �깮�꽦 諛� �쟾�넚 �븿�닔
 		CMDummyEvent due = new CMDummyEvent();
-		// due.setDummyInfo("서버로 전송하는 메시지");
+		// due.setDummyInfo("�꽌踰꾨줈 �쟾�넚�븯�뒗 硫붿떆吏�");
 		// due.setID(0);
 		due.setDummyInfo("FileListRequest");
 		due.setID(1);
 		
-		System.out.println("**** [DummyEvent] 클라이언트 ----> 서버  : " + due.getDummyInfo());
-		//m_clientStub.send(due,"SERVER"); // 서버로 전송	
+		System.out.println("**** [DummyEvent] �겢�씪�씠�뼵�듃 ----> �꽌踰�  : " + due.getDummyInfo());
+		//m_clientStub.send(due,"SERVER"); // �꽌踰꾨줈 �쟾�넚	
 	}
 
-	public void fileEvent() { // 더미이벤트 생성 및 전송 함수
+	public void fileEvent() { // �뜑誘몄씠踰ㅽ듃 �깮�꽦 諛� �쟾�넚 �븿�닔
 		CMFileEvent fe = new CMFileEvent();
 		fe.setID(fe.REQUEST_PERMIT_PULL_FILE);
 		
-		System.out.println("**** 클라이언트 ----> 서버 : file 데이터 전송 완료 ");
-		m_clientStub.send(fe,"SERVER"); // 서버로 전송	
+		System.out.println("**** �겢�씪�씠�뼵�듃 ----> �꽌踰� : file �뜲�씠�꽣 �쟾�넚 �셿猷� ");
+		m_clientStub.send(fe,"SERVER"); // �꽌踰꾨줈 �쟾�넚	
 	}
 
 	public void testSetFilePath()
