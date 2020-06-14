@@ -84,6 +84,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			break;
 		case 4: // 신규 유저 정보
 			c_user.add(strs[0]);
+			UI.userSwing(c_user);
 			System.out.println("**** 클라이언트 : 신규유저 추가"); // 메시지 출력	
 			break;
 		default:

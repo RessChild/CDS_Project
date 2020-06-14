@@ -10,6 +10,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -45,12 +46,14 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	// 사용자가 불러온 PDF 페이지 별 이미지 및 파일 정보 저장하고 있는 객체
 	Pdf currPDF;
 	String selectedFile;
+	Vector<String> user;
 	
 	UserInterface(String title, CMClientStub m_clientStub,
 	   CMClientEventHandler m_eventHandler) {
 		setTitle(title);
 		this.m_clientStub = m_clientStub;
 		this.m_eventHandler = m_eventHandler;
+		this.user = new Vector<>();
 		Toolkit kit = this.getToolkit();//시스템 정보를 가져옴, AWT에 있다.
 		Dimension screenSize= kit.getScreenSize();//반환값이 Dimension(폭과 높이정보를 가진 하나의 타입)
 		this.screenWidth = screenSize.width;
@@ -131,10 +134,15 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		frame.add(pdfPanel, BorderLayout.WEST);
 	}
 	
-	public void userSwing() {
+	public void userSwing(Vector<String> user) {
 		userPanel = new JPanel(new BorderLayout());
-		String[] users = {"user1", "user2", "user3"};
 		//users 리스트에 현재 사용자를 넣는 과정
+		String[] users = new String[user.size() + 1];
+		if(user.size() != 0) {
+			for(int i =0; i < user.size(); i++) {
+				users[i] = user.get(i);
+			}
+		}
 		userList = new JList(users);
 		
 		userList.addListSelectionListener(this);
@@ -153,7 +161,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		
 		pdfSwing();
 		
-		userSwing();
+		userSwing(user);
 		
 		// 버튼 클릭 리스너 추가
 		LocalFileButton.addActionListener(this);
