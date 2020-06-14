@@ -133,9 +133,24 @@ public class CMClientEventHandler implements CMAppEventHandler {
 				System.out.println("아직 서버 내에 파일이 없어요");
 			}
 		}
-		else if (de.getID() == RequestID.SELECT_SERVER_FILE) {
-			c_fname = de.getDummyInfo();
-			System.out.println("[클라이언트] 선택한 파일 : "+ c_fname);
+		else if (de.getID() == RequestID.SELECT_SERVER_FILE) { // 선택한 파일 이름 확인
+			this.c_fname = de.getDummyInfo();
+			System.out.println("[클라이언트] 선택한 파일 : "+ this.c_fname);
+			
+			File check = new File(m_clientStub.getTransferedFileHome() + "\\" + this.c_fname);
+			if(check.exists()) {
+				System.out.println("************* [클라이언트] 이미 해당 파일 있으니 그냥 열겠음"); // 얻은 메시지 확인
+				// ~~~ UI에 화면 출력하는 과정 거치도록..
+				UI.setLabel(check.getPath());
+			}
+			else {
+			System.out.println("************* [클라이언트] 파일 달라고 서버헌태 요청.."); // 얻은 메시지 확인
+			
+			CMDummyEvent nde = new CMDummyEvent();
+			nde.setDummyInfo(this.c_fname);
+			nde.setID(RequestID.SERVER_FILE_REQ);
+			m_clientStub.send(nde, "SERVER"); // 요청자한테 전송
+			}
 		}
 	}
 		
@@ -161,6 +176,14 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			nfe.setFilePath("test.pdf");
 			System.out.println("**** 서버 ----> 클라이언트 : "+nfe.getFilePath());
 			m_clientStub.send(fe, fe.getSender()); // 요청자한테 전송				
+			break;
+		case CMFileEvent.END_FILE_TRANSFER_CHAN: // 18번 메시지 ( 파일 전송 종료 )
+			System.out.println("******** [클라이언트 파일이벤트] 파일 다받았당 ㅎ : "+ fe.getID());
+			UI.setLabel(m_clientStub.getTransferedFileHome() + "\\" + this.c_fname);
+			break;
+		default:
+			System.out.println("******** [클라이언트 파일이벤트] 그 외 기타 : "+ fe.getID());
+			break;
 		}
 		return;
 	}

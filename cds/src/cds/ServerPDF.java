@@ -15,7 +15,10 @@ public class ServerPDF {
 		this.file = file;
 		this.comments = new HashMap<>();
 	}
-
+	
+	public String getFilePath() {
+		return this.file.getAbsolutePath();
+	}
 	
 	public String getFileName() {
 		return this.fileName;

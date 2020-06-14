@@ -178,6 +178,10 @@ public class CMServerEventHandler implements CMAppEventHandler {
 				e1.printStackTrace();
 			}
 		}
+		else if (de.getID() == RequestID.SERVER_FILE_REQ) {
+			String f = s_pdf.get(de.getDummyInfo()).getFilePath();
+			pushFile(f, de.getSender());
+		}
 	}
 	
 	public void sessionEvent(CMEvent e) {
@@ -252,7 +256,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 			nfe.setID(fe.REPLY_PERMIT_PULL_FILE);
 //			nfe.setFilePath("test.pdf");
 			System.out.println("**** 클라이언트 ----> 서버 : "+nfe.getFilePath());
-			m_serverStub.send(fe, fe.getSender()); // 요청자한테 전송
+			m_serverStub.send(nfe, fe.getSender()); // 요청자한테 전송
 			break;
 		case CMFileEvent.START_FILE_TRANSFER_CHAN: // 16번 이벤트
 			System.out.println("**** [서버] 클라이언트에서 파일이 들어와버렷!");
@@ -266,6 +270,12 @@ public class CMServerEventHandler implements CMAppEventHandler {
 			
 			System.out.print(s_pdf);
 			break;
+		case CMFileEvent.REPLY_PERMIT_PUSH_FILE: // 4번 이벤트
+			System.out.println("**** [서버] REPLY_PERMIT_PUSH_FILE");			
+			break;
+		case CMFileEvent.END_FILE_TRANSFER_CHAN_ACK: // 19번 이벤트
+			System.out.println("**** [서버] 파일 전송 허락받았다굿!");
+			break;
 		default:
 			System.out.println("**** 둘다 아니야~~ : " + fe.getID()); // 얻은 메시지 확인			
 			break;
@@ -274,17 +284,10 @@ public class CMServerEventHandler implements CMAppEventHandler {
 	
 	public void pushFile(String f, String who) // 파일 푸시
 	{
-		String strFilePath = null;
-		File files;
-		byte byteFileAppendMode = -1;
+		byte byteFileAppendMode = CMInfo.FILE_DEFAULT;
 		boolean bReturn = false;
-		
-		byteFileAppendMode = CMInfo.FILE_DEFAULT;
-		
-		files = new File(f);
-		
-		strFilePath = files.getPath();
-		bReturn = m_serverStub.pushFile(strFilePath, who, byteFileAppendMode);
+
+		bReturn = m_serverStub.pushFile(f, who, byteFileAppendMode);
 		if (!bReturn) {
 			System.out.println("*************** 파일 전송 에러! **************");
 		}

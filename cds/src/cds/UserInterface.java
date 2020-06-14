@@ -179,6 +179,14 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		commentBtn.addActionListener(this);
 	}
 	
+	public void setLabel(String str) {
+		this.fileLabel.setText(str);
+		//pdf를 띄우는 부분
+		
+		this.currPDF = new Pdf(str);
+		this.pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == LocalFileButton) {
@@ -191,11 +199,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 				pushFile(file); // 서버로 파일 전송
 				
 				String path = file.getPath();
-				fileLabel.setText(path);
-				
-				//pdf를 띄우는 부분
-				currPDF = new Pdf(path);
-				pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
+				setLabel(path);				
 			}
 		}else if(e.getSource() == ServerFileButton) {
 			//서버에서 pdf파일을 불러옴
@@ -285,7 +289,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		m_clientStub.send(de, this.userName);
 	}
 	
-	public String returnSelect() {
-		return this.selectedFile;
+	public String getUser() {
+		return this.userName;
 	}
 }

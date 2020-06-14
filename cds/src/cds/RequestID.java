@@ -13,4 +13,6 @@ public class RequestID {
 	public static int REQ_COMMENT = 5;
 	
 	public static int SELECT_SERVER_FILE = 6;
+	
+	public static int SERVER_FILE_REQ = 7;
 }
