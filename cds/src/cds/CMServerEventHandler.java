@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
@@ -21,6 +22,8 @@ import kr.ac.konkuk.ccslab.cm.event.CMEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMFileEvent;
 import kr.ac.konkuk.ccslab.cm.event.CMSessionEvent;
 import kr.ac.konkuk.ccslab.cm.event.handler.CMAppEventHandler;
+import kr.ac.konkuk.ccslab.cm.info.CMConfigurationInfo;
+import kr.ac.konkuk.ccslab.cm.info.CMFileTransferInfo;
 import kr.ac.konkuk.ccslab.cm.info.CMInfo;
 import kr.ac.konkuk.ccslab.cm.stub.CMServerStub;
 
@@ -41,6 +44,8 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		
 		s_pdf = new HashMap<String, ServerPDF>();
 		s_user = new Vector<String>();
+		
+		setFilePath();
 	}
 	
 	@Override
@@ -69,12 +74,10 @@ public class CMServerEventHandler implements CMAppEventHandler {
 //		String p = "./server-file-path/";
 //		pushFile(p+"test.pdf", de.getSender());
 		
-		List<String> fileList = new ArrayList<>();
-		fileList.add("file1");
-		fileList.add("file2");
-		fileList.add("fil3");
 		
 		if (de.getID() == FILE_LIST_REQ_ID) {
+			Set<String> fileList = s_pdf.keySet(); // 서버가 가진 모든 파일의 키값을 전달
+			System.out.println("************ [서버핸들러] 모든 파일 키값 반환!");
 			CMDummyEvent nde = new CMDummyEvent();
 			nde.setID(FILE_LIST_REQ_ID);
 			
@@ -175,53 +178,6 @@ public class CMServerEventHandler implements CMAppEventHandler {
 				e1.printStackTrace();
 			}
 		}
-
-		/*
-		 		CMDummyEvent nde = new CMDummyEvent();
-		StringBuilder sb = new StringBuilder();
-		
-		switch(de.getID()) {
-		case 1: // 현재 보유한 파일리스트 반환
-			nde.setID(1);
-
-			for (File pdf : s_pdf) { // 모든 파일의 이름을 문자열로 변환
-				System.out.println(pdf);
-				sb.append(pdf.getName() + "#");
-			}
-//			sb.append("abc");
-			System.out.println("****요까지");
-
-			nde.setDummyInfo(sb.toString());
-			m_serverStub.send(nde, de.getSender()); // 메시지 전송
-			System.out.println("******************** [더미이벤트] 서버-->클라이언트 : 파일리스트 메시지 전송 완료");
-			break;
-		case 2: // 사용자 이름 반환
-			nde.setID(2);
-			
-			for (String user : s_user) { // 모든 파일의 이름을 문자열로 변환
-				sb.append(user + "#");
-			}
-			
-			nde.setDummyInfo(sb.toString());
-			m_serverStub.send(nde, de.getSender()); // 메시지 전송
-			System.out.println("******************** [더미이벤트] 서버-->클라이언트 : 유저 리스트 전송 완료");
-			break;
-		case 3: // 해당 페이지에 기록된 주석정보
-			nde.setID(3);
-			String[] wd = de.getDummyInfo().split("#");
-			int f = Integer.parseInt(wd[0]),
-				u = Integer.parseInt(wd[1]),
-				p = Integer.parseInt(wd[2]);
-			sb.append(s_content.get(f).get(u).get(p));
-			nde.setDummyInfo(sb.toString());
-			m_serverStub.send(nde, de.getSender()); // 메시지 전송
-			System.out.println("******************** [더미이벤트] 서버-->클라이언트 : 페이지 주석 전송 완료");
-			break;
-		default:
-			System.out.println("******** [DummyEvent] Can't Find to Do");
-		}
-		 */
-
 	}
 	
 	public void sessionEvent(CMEvent e) {
@@ -249,13 +205,15 @@ public class CMServerEventHandler implements CMAppEventHandler {
 				System.out.println("******************** [로그인] 신규 유저 정보 전송");
 				
 			}
+		case CMSessionEvent.LOGOUT: // 2번 이벤트
+			break;
 		case CMSessionEvent.ADD_BLOCK_SOCKET_CHANNEL: // 22번 이벤트
 			break;
 		case CMSessionEvent.JOIN_SESSION: // 6번 이벤트
 			System.out.println("새로운 대상이 참여 : " + se.getSender());
 			break;
 		default:
-			throw new IllegalArgumentException("Unexpected value: " + se.getID());
+			System.out.println("그 외의 이벤트");
 		}
 	}
 	
@@ -266,32 +224,54 @@ public class CMServerEventHandler implements CMAppEventHandler {
 	}
 	
 	public void fileEvent(CMEvent e) {
-		CMFileEvent de = (CMFileEvent) e;
+		CMFileEvent fe = (CMFileEvent) e;
 		System.out.println("**** 서버 측 수신 메시지 : 파일 요청 메시지"); // 얻은 메시지 확인
 
-		CMFileEvent fe = new CMFileEvent();
-		fe.setID(fe.REPLY_PERMIT_PULL_FILE);
-		fe.setFilePath("test.pdf");
-		System.out.println("**** 서버 ----> 클라이언트 : "+fe.getFilePath());
-		m_serverStub.send(fe, de.getSender()); // 요청자한테 전송
-	}
-	
-	// 파일관련 함수
-	public void setFilePath()
-	{
-		// 파일 경로 세팅 
-		String strPath = null;
-
-		strPath = JOptionPane.showInputDialog("file path: ");
-		if(strPath == null)
-		{
-			return;
+//		CMConfigurationInfo confInfo = null;
+//		CMFileTransferInfo fInfo = m_serverStub.getCMInfo().getFileTransferInfo();
+//		int nOption = -1;
+//		long lTotalDelay = 0;
+//		long lTransferDelay = 0;
+		
+		switch(fe.getID()) {
+		case CMFileEvent.REQUEST_PERMIT_PUSH_FILE: // 파일 받을떄
+			System.out.println("**************** [서버] 푸시요청"); // 얻은 메시지 확인
+			
+			StringBuffer strReqBuf = new StringBuffer(); 
+			strReqBuf.append("["+fe.getFileSender()+"] wants to send a file.\n");
+			strReqBuf.append("file path: "+fe.getFilePath()+"\n");
+			strReqBuf.append("file size: "+fe.getFileSize()+"\n");
+			System.out.println(strReqBuf.toString());
+			
+			m_serverStub.replyEvent(fe, 1); // 1이면 찬성 0이면 거절			
+			break;
+		case CMFileEvent.REQUEST_PERMIT_PULL_FILE: // 파일 줄 때 (서버->클라이언트)
+			System.out.println("**************** [서버] 풀 요청.."); // 얻은 메시지 확인
+			
+			CMFileEvent nfe = new CMFileEvent();
+			nfe.setID(fe.REPLY_PERMIT_PULL_FILE);
+//			nfe.setFilePath("test.pdf");
+			System.out.println("**** 클라이언트 ----> 서버 : "+nfe.getFilePath());
+			m_serverStub.send(fe, fe.getSender()); // 요청자한테 전송
+			break;
+		case CMFileEvent.START_FILE_TRANSFER_CHAN: // 16번 이벤트
+			System.out.println("**** [서버] 클라이언트에서 파일이 들어와버렷!");
+			break;
+		case CMFileEvent.END_FILE_TRANSFER_CHAN: // 18번 이벤트
+			System.out.println("**** [서버] 클라이언트에서 파일이 다들어왔다굿!");
+			
+			String fileName = m_serverStub.getTransferedFileHome() +"\\" + fe.getSender() +"\\"+ fe.getFileName();
+			System.out.println("************* [서버] 도착한 파일 이름 : " + fileName);
+			s_pdf.put(fe.getFileName(), new ServerPDF(fileName, new File(fileName))); // 새로 얻은 파일을 리스트에 추가
+			
+			System.out.print(s_pdf);
+			break;
+		default:
+			System.out.println("**** 둘다 아니야~~ : " + fe.getID()); // 얻은 메시지 확인			
+			break;
 		}
-		
-		m_serverStub.setTransferedFileHome(Paths.get(strPath));
-		
-	}
-
+	}	
+	
 	public void pushFile(String f, String who) // 파일 푸시
 	{
 		String strFilePath = null;
@@ -300,17 +280,6 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		boolean bReturn = false;
 		
 		byteFileAppendMode = CMInfo.FILE_DEFAULT;
-
-		/*
-		JFileChooser fc = new JFileChooser();
-		fc.setMultiSelectionEnabled(true);
-		CMConfigurationInfo confInfo = m_serverStub.getCMInfo().getConfigurationInfo();
-		File curDir = new File(confInfo.getTransferedFileHome().toString());
-		fc.setCurrentDirectory(curDir);
-		int fcRet = fc.showOpenDialog(this);
-		if(fcRet != JFileChooser.APPROVE_OPTION) return;
-		files = fc.getSelectedFiles(); // 여기서 파일 선택 구문인데..
-		 */
 		
 		files = new File(f);
 		
@@ -319,5 +288,11 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		if (!bReturn) {
 			System.out.println("*************** 파일 전송 에러! **************");
 		}
+	}
+	
+	public void setFilePath()
+	{
+		String p = "./server-file-path/";
+		m_serverStub.setTransferedFileHome(Paths.get(p));
 	}
 }

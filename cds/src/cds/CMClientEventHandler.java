@@ -5,6 +5,7 @@ import java.awt.Desktop;
 import java.awt.desktop.FilesEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -43,6 +44,8 @@ public class CMClientEventHandler implements CMAppEventHandler {
 		this.m_clientStub = cs;
 		this.UI = ui;
 		this.c_user = new Vector<String>();
+		
+		setFilePath();
 	}
 	
 	public void setUI(UserInterface ui) {
@@ -59,7 +62,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
 		case CMInfo.CM_SESSION_EVENT:
 			break;
 		case CMInfo.CM_FILE_EVENT:
-			processFileEvent(arg0);
+			fileEvent(arg0);
 			//			fileEvent(arg0);
 			break;
 		}
@@ -69,7 +72,6 @@ public class CMClientEventHandler implements CMAppEventHandler {
 		CMDummyEvent de = (CMDummyEvent) e; // 이벤트 형변환
 
 		System.out.println("**** 클라이언트 측 수신 메시지 : " + de.getDummyInfo()); // 메시지 출력
-
 		String[] strs = de.getDummyInfo().split("#"); // 샵을 기준으로 쪼갬
 
 		// 등록된 유저 목록 반영
@@ -117,31 +119,24 @@ public class CMClientEventHandler implements CMAppEventHandler {
 				System.out.print(file + ", ");
 			}
 			System.out.println();
-			m_client.showFileList(fileList);
+			if(fileList[0] != "")
+				m_client.showFileList(fileList);
+			else {
+				System.out.println("아직 서버 내에 파일이 없어요");
+			}
 		}
 		
 		System.out.println(c_user); // 메시지 출력
 	}
-	
-	public void fileEvent(CMEvent e) {
-		CMFileEvent fe = (CMFileEvent) e;
-		System.out.print("**** 클라이언트 수신 파일 : " + fe.getFileBlock().toString());
-	}
-	
-	
+		
 	// 여기서 파일 전송요청에 대한 push 허가 정보를 내보내야 함..
-	private void processFileEvent(CMEvent cme)
+	private void fileEvent(CMEvent cme)
 	{
 		CMFileEvent fe = (CMFileEvent) cme;
-		CMConfigurationInfo confInfo = null;
-		CMFileTransferInfo fInfo = m_clientStub.getCMInfo().getFileTransferInfo();
-		int nOption = -1;
-		long lTotalDelay = 0;
-		long lTransferDelay = 0;
 		
 		switch(fe.getID())
 		{
-		case CMFileEvent.REQUEST_PERMIT_PUSH_FILE:
+		case CMFileEvent.REQUEST_PERMIT_PUSH_FILE: // 이게 원래있던거
 			StringBuffer strReqBuf = new StringBuffer(); 
 			strReqBuf.append("["+fe.getFileSender()+"] wants to send a file.\n");
 			strReqBuf.append("file path: "+fe.getFilePath()+"\n");
@@ -150,7 +145,19 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			
 			m_clientStub.replyEvent(fe, 1); // 1이면 찬성 0이면 거절			
 			break;
+		case CMFileEvent.REPLY_PERMIT_PULL_FILE:
+			CMFileEvent nfe = new CMFileEvent();
+			nfe.setID(fe.REPLY_PERMIT_PULL_FILE);
+			nfe.setFilePath("test.pdf");
+			System.out.println("**** 서버 ----> 클라이언트 : "+nfe.getFilePath());
+			m_clientStub.send(fe, fe.getSender()); // 요청자한테 전송				
 		}
 		return;
+	}
+	
+	public void setFilePath()
+	{
+		String p = "./client-file-path/";
+		m_clientStub.setTransferedFileHome(Paths.get(p));
 	}
 }

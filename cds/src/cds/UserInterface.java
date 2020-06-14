@@ -29,6 +29,7 @@ import javax.swing.event.ListSelectionListener;
 import org.json.simple.JSONObject;
 
 import kr.ac.konkuk.ccslab.cm.event.CMDummyEvent;
+import kr.ac.konkuk.ccslab.cm.info.CMInfo;
 import kr.ac.konkuk.ccslab.cm.stub.CMClientStub;
 
 public class UserInterface extends JFrame implements ActionListener, ListSelectionListener{
@@ -43,17 +44,17 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	JTextArea note;//일단 실제 pdf대신 textArea로 놓는다
 	JLabel pdf;
 	FileDialog dialog;
+	
 	CMClientStub m_clientStub;
-	CMClientEventHandler m_eventHandler;
+//	CMClientEventHandler m_eventHandler;
 	// 사용자가 불러온 PDF 페이지 별 이미지 및 파일 정보 저장하고 있는 객체
+	
 	Pdf currPDF;
 	String selectedFile;
 	Vector<String> user;
 	
-	UserInterface(String title, CMClientStub m_clientStub,
-	   CMClientEventHandler m_eventHandler) {
+	UserInterface(String title, CMClientStub m_clientStub) {
 		this.m_clientStub = m_clientStub;
-		this.m_eventHandler = m_eventHandler;
 		this.user = new Vector<>();
 		Toolkit kit = this.getToolkit();//시스템 정보를 가져옴, AWT에 있다.
 		Dimension screenSize= kit.getScreenSize();//반환값이 Dimension(폭과 높이정보를 가진 하나의 타입)
@@ -89,7 +90,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		
 		// PDF 패널 부분 크기 고정해야
 		// PDF 이미지 크기 따라서 창 크기 왔다갔다 하지 않
-		pdfPanel.setPreferredSize(new Dimension(1024, this.screenHeight));
+		pdfPanel.setPreferredSize(new Dimension(1024, this.screenHeight*2/3));
 		
 		// GridBagLayout Cell 별로 속성 정의하는 변수 초기화
 		GridBagConstraints[] gbc = new GridBagConstraints[3];
@@ -182,6 +183,8 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 			if(result == JFileChooser.APPROVE_OPTION) {
 				//사용자가 열기에 해당하는 버튼을 눌렀다면.
 				File file = filedlg.getSelectedFile();
+				pushFile(file); // 서버로 파일 전송
+				
 				String path = file.getPath();
 				fileLabel.setText(path);
 				
@@ -254,4 +257,19 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		}
 	}
 	
+	public void pushFile(File f) // 파일 푸시
+	{
+		String strFilePath = null;
+		byte byteFileAppendMode = -1;
+		boolean bReturn = false;
+		
+		byteFileAppendMode = CMInfo.FILE_DEFAULT;
+				
+		strFilePath = f.getPath();
+		bReturn = m_clientStub.pushFile(strFilePath, "SERVER", byteFileAppendMode);
+		if (!bReturn) {
+			System.out.println("*************** 파일 전송 에러! **************");
+			System.out.println("이미 파일이 존재할 수 있어요");
+		}
+	}
 }

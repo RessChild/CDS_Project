@@ -37,7 +37,7 @@ public class clientMain {
 */
 
 		m_clientStub = new CMClientStub();
-		UI = new UserInterface("test", m_clientStub, m_eventHandler);
+		UI = new UserInterface("test", m_clientStub);
 		m_eventHandler = new CMClientEventHandler(this, m_clientStub, UI);
 		userName = null;
 	}
@@ -88,14 +88,6 @@ public class clientMain {
 		System.out.println("**** 클라이언트 ----> 서버 : file 데이터 전송 완료 ");
 		m_clientStub.send(fe,"SERVER"); // 서버로 전송	
 	}
-
-	public void testSetFilePath()
-	{
-		String strPath = null;
-		
-		strPath = ".";
-		m_clientStub.setTransferedFileHome(Paths.get(strPath));
-	}
 	
 	public void getLoginInfo() {
 		
@@ -108,73 +100,5 @@ public class clientMain {
 		{
 			userName = userNameField.getText();
 		}
-		
 	}
-    /*
-	public void testPushFile()
-	{
-		String strFilePath = null;
-		File[] files = null;
-		String strReceiver = null;
-		byte byteFileAppendMode = -1;
-		CMInteractionInfo interInfo = m_clientStub.getCMInfo().getInteractionInfo();
-		boolean bReturn = false;
-
-		System.out.println("====== push a file\n");
-		
-
-		JTextField freceiverField = new JTextField();
-		String[] fAppendMode = {"Default", "Overwrite", "Append"};		
-		JComboBox<String> fAppendBox = new JComboBox<String>(fAppendMode);
-
-		Object[] message = { 
-				"File Receiver(empty for default server): ", freceiverField,
-				"File Append Mode: ", fAppendBox 
-				};
-		int option = JOptionPane.showConfirmDialog(null, message, "File Push", JOptionPane.OK_CANCEL_OPTION);
-		if(option == JOptionPane.CANCEL_OPTION || option != JOptionPane.OK_OPTION)
-		{
-			printMessage("canceled.\n");
-			return;
-		}
-		
-		strReceiver = freceiverField.getText().trim();
-		if(strReceiver.isEmpty())
-			strReceiver = interInfo.getDefaultServerInfo().getServerName();
-		
-		switch(fAppendBox.getSelectedIndex())
-		{
-		case 0:
-			byteFileAppendMode = CMInfo.FILE_DEFAULT;
-			break;
-		case 1:
-			byteFileAppendMode = CMInfo.FILE_OVERWRITE;
-			break;
-		case 2:
-			byteFileAppendMode = CMInfo.FILE_APPEND;
-			break;			
-		}
-		
-		JFileChooser fc = new JFileChooser();
-		fc.setMultiSelectionEnabled(true);
-		CMConfigurationInfo confInfo = m_clientStub.getCMInfo().getConfigurationInfo();
-		File curDir = new File(confInfo.getTransferedFileHome().toString());
-		fc.setCurrentDirectory(curDir);
-		int fcRet = fc.showOpenDialog(this);
-		if(fcRet != JFileChooser.APPROVE_OPTION) return;
-		files = fc.getSelectedFiles();
-		if(files.length < 1) return;
-		for(int i=0; i < files.length; i++)
-		{
-			strFilePath = files[i].getPath();
-			bReturn = m_clientStub.pushFile(strFilePath, strReceiver, byteFileAppendMode);
-			if(!bReturn)
-			{
-				printMessage("push file error! file("+strFilePath+"), receiver("
-						+strReceiver+")\n");
-			}
-		}
-	}
-	*/
-
 }

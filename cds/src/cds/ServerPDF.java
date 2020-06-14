@@ -10,10 +10,9 @@ public class ServerPDF {
 	private int pageNum;
 	private HashMap<String, String[]> comments;
 	
-	public ServerPDF(String fileName, File file, int pageNum) {
+	public ServerPDF(String fileName, File file) {
 		this.fileName = fileName;
 		this.file = file;
-		this.pageNum = pageNum;
 		this.comments = new HashMap<>();
 	}
 
