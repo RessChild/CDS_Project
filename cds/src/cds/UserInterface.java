@@ -10,6 +10,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
@@ -53,10 +54,12 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	String selectedFile;
 	Vector<String> user;
 	String userName;
+	HashMap<Integer, String> comments;
 	
 	UserInterface(String title, CMClientStub m_clientStub) {
 		this.m_clientStub = m_clientStub;
 		this.user = new Vector<>();
+		this.comments = new HashMap<>();
 		Toolkit kit = this.getToolkit();//시스템 정보를 가져옴, AWT에 있다.
 		Dimension screenSize= kit.getScreenSize();//반환값이 Dimension(폭과 높이정보를 가진 하나의 타입)
 		this.screenWidth = screenSize.width;
@@ -176,7 +179,30 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		ServerFileButton.addActionListener(this);
 		preBtn.addActionListener(this);
 		nextBtn.addActionListener(this);
-		commentBtn.addActionListener(this);
+		commentBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(currPDF != null) {
+					JSONObject jsonObj = new JSONObject();
+					jsonObj.put("fileName", currPDF.getFileName());
+					jsonObj.put("pageNum", currPDF.getCurrentPageNum());
+					jsonObj.put("comment", note.getText());
+					
+					CMDummyEvent due = new CMDummyEvent();
+					due.setDummyInfo(jsonObj.toString());
+					due.setID(RequestID.ADD_COMMENT);
+					m_clientStub.send(due, "SERVER");
+					
+					System.out.println("****** [Client add comment] *******");	
+					System.out.println("Msg : " + jsonObj.toString());
+				}
+				else {
+					System.out.println("Open PDF first!!");
+				}
+			}
+			
+		});
 	}
 	
 	public void setLabel(String str) {
@@ -185,6 +211,15 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		
 		this.currPDF = new Pdf(str);
 		this.pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
+	}
+	
+	public void setComment(HashMap<Integer, String> comments) {
+		int currentPage = this.currPDF.getCurrentPageNum();
+		
+		if(comments.containsKey(currentPage)) {
+			note.setText(comments.get(currentPage));
+		}
+		this.comments = comments;
 	}
 	
 	@Override
@@ -201,31 +236,44 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 				String path = file.getPath();
 				setLabel(path);				
 			}
-		}else if(e.getSource() == ServerFileButton) {
+		} 
+		else if(e.getSource() == ServerFileButton) {
 			//서버에서 pdf파일을 불러옴
 			CMDummyEvent due = new CMDummyEvent();
 			due.setDummyInfo("FileListRequest");
 			due.setID(1);
 			this.m_clientStub.send(due, "SERVER");
-		} else if(e.getSource() == preBtn) {
+		} 
+		else if(e.getSource() == preBtn) {
 			//pdf 이전 페이지 
 			if(currPDF != null) {
 				currPDF.decrementPageNum();
 				pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 			}
+			if(comments.containsKey(currPDF.getCurrentPageNum())) {
+				note.setText(comments.get(currPDF.getCurrentPageNum()));
+			} else {
+				note.setText("");
+			}
 			
-		}else if(e.getSource() == nextBtn) {
+		} 
+		else if(e.getSource() == nextBtn) {
 			//pdf 다음 페이지
 			if(currPDF != null) {
 				currPDF.incrementPageNum();
 				pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 			}
-			
-		}else if(e.getSource() == commentBtn) {
+			if(comments.containsKey(currPDF.getCurrentPageNum())) {
+				note.setText(comments.get(currPDF.getCurrentPageNum()));
+			} else {
+				note.setText("");
+			}
+		} 
+		else if(e.getSource() == commentBtn) {
 			//주석달기 버튼
-			
+			System.out.println("주석 버튼 클리기만ㅇ럼니;ㄹ어ㅏㅁ닝러ㅏㅣ;ㅂㅈ걱ㅂㄷ");
 			// 사용자가 오픈한 PDF가 있을 때만 주석 달기 가능
-			if(currPDF != null) {
+			if(this.currPDF != null) {
 				JSONObject jsonObj = new JSONObject();
 				jsonObj.put("fileName", currPDF.getFileName());
 				jsonObj.put("pageNum", currPDF.getCurrentPageNum());
@@ -235,12 +283,16 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 				due.setDummyInfo(jsonObj.toString());
 				due.setID(RequestID.ADD_COMMENT);
 				this.m_clientStub.send(due, "SERVER");
+				
+				System.out.println("****** [Client add comment] *******");	
+				System.out.println("Msg : " + jsonObj.toString());
 			}
 			else {
 				System.out.println("Open PDF first!!");
 			}
 		}
 	}
+	
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		// TODO Auto-generated method stub

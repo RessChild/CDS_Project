@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import javax.swing.JOptionPane;
 
@@ -37,6 +39,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
 	private String c_fname; // 선택한 파일 명
 	private Vector<String> c_user; // pdf 참여자 정보
 	private String c_content = null; // 현재 페이지의 기록
+	private HashMap<Integer, String> c_comments;
 	
 	public CMClientEventHandler(clientMain c, CMClientStub cs, UserInterface ui) {
 		// TODO Auto-generated constructor stub
@@ -44,6 +47,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
 		this.m_clientStub = cs;
 		this.UI = ui;
 		this.c_user = new Vector<String>();
+		this.c_comments = new HashMap<Integer, String>();
 		
 		setFilePath();
 	}
@@ -100,15 +104,14 @@ public class CMClientEventHandler implements CMAppEventHandler {
 				JSONObject jsonObj = (JSONObject) obj;
 				JSONArray comments = (JSONArray) jsonObj.get("comments");
 				
-				List<String> userComments = new ArrayList<>();
-				for(int i = 0; i < comments.size(); i++) {
-					userComments.add((String) comments.get(i)); 
+				for(int i = 0; i <comments.size(); i++) {
+					JSONObject commentObj = (JSONObject) comments.get(i);
+					this.c_comments.put(((Long) commentObj.get("page")).intValue(), (String )commentObj.get("comment"));
 				}
-				for(int i = 0; i < userComments.size(); i++) {
-					System.out.print(userComments.get(i));
+				for(Entry<Integer, String> c : c_comments.entrySet()) {
+					System.out.println("page : " + c.getKey() + ", comment : " + c.getValue());
 				}
-				System.out.println();
-				
+				UI.setComment(c_comments);
 				
 			} catch (ParseException e1) {
 				e1.printStackTrace();
@@ -123,11 +126,6 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			System.out.println();
 			if(fileList[0] != "") {
 				m_client.showFileList(fileList);
-
-//				c_fname = UI.returnSelect();
-//				System.out.println(c_fname);
-				// 이 부분이 리스너처럼 작동해야 함..
-				// 메시지를 보내나?
 			}
 			else {
 				System.out.println("아직 서버 내에 파일이 없어요");
@@ -151,6 +149,11 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			nde.setID(RequestID.SERVER_FILE_REQ);
 			m_clientStub.send(nde, "SERVER"); // 요청자한테 전송
 			}
+		}
+		else if (de.getID() == RequestID.ADD_COMMENT) {
+			String msg = de.getDummyInfo();
+			System.out.println("******* [ADD COMMENT EVENT] ********");
+			System.out.println("Message : "+ msg);
 		}
 	}
 		
@@ -179,7 +182,8 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			break;
 		case CMFileEvent.END_FILE_TRANSFER_CHAN: // 18번 메시지 ( 파일 전송 종료 )
 			System.out.println("******** [클라이언트 파일이벤트] 파일 다받았당 ㅎ : "+ fe.getID());
-			UI.setLabel(m_clientStub.getTransferedFileHome() + "\\" + this.c_fname);
+//			UI.setLabel(m_clientStub.getTransferedFileHome() + "\\" + this.c_fname);
+			UI.setLabel(m_clientStub.getTransferedFileHome() + "/" + this.c_fname);
 			break;
 		default:
 			System.out.println("******** [클라이언트 파일이벤트] 그 외 기타 : "+ fe.getID());

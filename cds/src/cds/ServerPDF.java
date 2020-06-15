@@ -2,13 +2,14 @@ package cds;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class ServerPDF {
 
 	private String fileName;
 	private File file;	
 	private int pageNum;
-	private HashMap<String, String[]> comments;
+	private HashMap<String, HashMap<Integer, String>> comments;
 	
 	public ServerPDF(String fileName, File file) {
 		this.fileName = fileName;
@@ -27,17 +28,19 @@ public class ServerPDF {
 	public void addComment(String userName, String comment, int page) {
 		
 		if (comments.containsKey(userName)) {
-			String[] userComment = comments.get(userName);
-			userComment[page] = comment;
+			comments.get(userName).put(page, comment);
 		}
 		else {
-			comments.put(userName, new String[pageNum]);
-			String[] userComment = comments.get(userName);
-			userComment[page] = comment;
+			comments.put(userName, new HashMap<>());
+			comments.get(userName).put(page, comment);
+		}
+		System.out.println("USER COMMENT " + userName + "---------");
+		for(Entry<Integer, String> c : comments.get(userName).entrySet()) {
+			System.out.println("page : " + c.getKey() + ", comment : " + c.getValue());
 		}
 	}
 	
-	public String[] getComment(String userName) {
+	public HashMap<Integer, String> getComment(String userName) {
 		return comments.get(userName);
 	}
 	
