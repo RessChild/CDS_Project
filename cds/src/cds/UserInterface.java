@@ -179,6 +179,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		ServerFileButton.addActionListener(this);
 		preBtn.addActionListener(this);
 		nextBtn.addActionListener(this);
+		// ########################
 		commentBtn.addActionListener(new ActionListener() {
 
 			@Override
@@ -213,6 +214,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		this.pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 	}
 	
+	// ########################
 	public void setComment(HashMap<Integer, String> comments) {
 		int currentPage = this.currPDF.getCurrentPageNum();
 		
@@ -250,6 +252,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 				currPDF.decrementPageNum();
 				pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 			}
+			// ########################
 			if(comments.containsKey(currPDF.getCurrentPageNum())) {
 				note.setText(comments.get(currPDF.getCurrentPageNum()));
 			} else {
@@ -263,32 +266,11 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 				currPDF.incrementPageNum();
 				pdf.setIcon(new ImageIcon(currPDF.getCurrPageImage()));
 			}
+			// ########################
 			if(comments.containsKey(currPDF.getCurrentPageNum())) {
 				note.setText(comments.get(currPDF.getCurrentPageNum()));
 			} else {
 				note.setText("");
-			}
-		} 
-		else if(e.getSource() == commentBtn) {
-			//주석달기 버튼
-			System.out.println("주석 버튼 클리기만ㅇ럼니;ㄹ어ㅏㅁ닝러ㅏㅣ;ㅂㅈ걱ㅂㄷ");
-			// 사용자가 오픈한 PDF가 있을 때만 주석 달기 가능
-			if(this.currPDF != null) {
-				JSONObject jsonObj = new JSONObject();
-				jsonObj.put("fileName", currPDF.getFileName());
-				jsonObj.put("pageNum", currPDF.getCurrentPageNum());
-				jsonObj.put("comment", note.getText());
-				
-				CMDummyEvent due = new CMDummyEvent();
-				due.setDummyInfo(jsonObj.toString());
-				due.setID(RequestID.ADD_COMMENT);
-				this.m_clientStub.send(due, "SERVER");
-				
-				System.out.println("****** [Client add comment] *******");	
-				System.out.println("Msg : " + jsonObj.toString());
-			}
-			else {
-				System.out.println("Open PDF first!!");
 			}
 		}
 	}

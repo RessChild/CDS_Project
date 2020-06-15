@@ -182,8 +182,8 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			break;
 		case CMFileEvent.END_FILE_TRANSFER_CHAN: // 18번 메시지 ( 파일 전송 종료 )
 			System.out.println("******** [클라이언트 파일이벤트] 파일 다받았당 ㅎ : "+ fe.getID());
-//			UI.setLabel(m_clientStub.getTransferedFileHome() + "\\" + this.c_fname);
-			UI.setLabel(m_clientStub.getTransferedFileHome() + "/" + this.c_fname);
+			UI.setLabel(m_clientStub.getTransferedFileHome() + "\\" + this.c_fname);
+//			UI.setLabel(m_clientStub.getTransferedFileHome() + "/" + this.c_fname);
 			break;
 		default:
 			System.out.println("******** [클라이언트 파일이벤트] 그 외 기타 : "+ fe.getID());

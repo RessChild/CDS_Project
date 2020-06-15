@@ -165,19 +165,6 @@ public class CMServerEventHandler implements CMAppEventHandler {
 					}
 				} else {
 					// 테스트
-					String[] comments = {"Comment from server!!", "new new comment"};
-					JSONObject sendJsonObj = new JSONObject();
-					JSONArray jsonArr = new JSONArray();
-					for(String comment : comments) {
-						jsonArr.add(comment);
-					}
-					sendJsonObj.put("comments", jsonArr);
-					
-					CMDummyEvent nde = new CMDummyEvent();
-					nde.setID(RequestID.REQ_COMMENT);
-					nde.setDummyInfo(sendJsonObj.toString());
-					
-					m_serverStub.send(nde, de.getSender());
 				}
 			}
 			catch (ParseException e1) {
