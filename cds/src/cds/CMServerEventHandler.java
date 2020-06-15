@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
@@ -140,14 +141,17 @@ public class CMServerEventHandler implements CMAppEventHandler {
 				ServerPDF req_pdf = s_pdf.get(fileName);
 				
 				if(req_pdf != null) {
-					String[] comments = req_pdf.getComment(userName);
+					HashMap<Integer, String> comments = req_pdf.getComment(userName);
 					
 					// 요청한 유저가 남겨놓은 주석이 있을 때만 전송
 					if (comments != null) {
 						JSONObject sendJsonObj = new JSONObject();
 						JSONArray jsonArr = new JSONArray();
-						for(String comment : comments) {
-							jsonArr.add(comment);
+						for(Entry<Integer, String> comment : comments.entrySet()) {
+							JSONObject commentObj = new JSONObject();
+							commentObj.put("page", comment.getKey());
+							commentObj.put("comment", comment.getValue());
+							jsonArr.add(commentObj);
 						}
 						sendJsonObj.put("comments", jsonArr);
 						
@@ -156,6 +160,8 @@ public class CMServerEventHandler implements CMAppEventHandler {
 						nde.setDummyInfo(sendJsonObj.toString());
 						
 						m_serverStub.send(nde, de.getSender());
+						
+						System.out.println("Server sent : " + sendJsonObj.toString());
 					}
 				} else {
 					// 테스트
@@ -180,6 +186,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		}
 		else if (de.getID() == RequestID.SERVER_FILE_REQ) {
 			String f = s_pdf.get(de.getDummyInfo()).getFilePath();
+			System.out.println(f);
 			pushFile(f, de.getSender());
 		}
 	}
