@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 import org.json.simple.JSONArray;
@@ -89,7 +90,11 @@ public class CMClientEventHandler implements CMAppEventHandler {
 		// 새로 등록된 유저 반영
 		else if(de.getID() == RequestID.REGISTER_USER) {
 			c_user.add(de.getDummyInfo());
-			UI.userSwing(c_user);
+			DefaultListModel list = new DefaultListModel();
+            for (int i =0; i < c_user.size(); i++) {
+                list.addElement(c_user.get(i));
+            }
+			UI.getUserList().setModel(list);
 			System.out.println("**** 클라이언트 : 신규유저 추가"); // 메시지 출력	
 			System.out.println(c_user); // 메시지 출력
 		}

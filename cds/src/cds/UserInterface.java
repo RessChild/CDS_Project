@@ -77,8 +77,13 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	
 	public void setUser(String s) {
 		this.userName = s;
+		this.setTitle(this.userName);
 	}
 	
+	public JList getUserList() {
+		return userList;
+	}
+
 	public void fileSwing() {
 		filePanel = new JPanel(new BorderLayout());
 		fileButtonPanel = new JPanel(new FlowLayout());
@@ -283,7 +288,8 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 			//주석을 어디에 저장하는지 몰라서 일단 사용자가 선택하면 해당 사용자이름을 콘솔에 띄움
 			System.out.println(userList.getSelectedValue());
 			String selectedUser = (String) userList.getSelectedValue();
-			
+			System.out.println("selectedUser: " + selectedUser);
+			System.out.println("my self: " + m_clientStub.getMyself().getName().toString());
 			if(currPDF != null) {
 				CMDummyEvent due = new CMDummyEvent();
 				
@@ -294,8 +300,10 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 				due.setID(RequestID.REQ_COMMENT);
 				this.m_clientStub.send(due, "SERVER");
 			}
-			if(userList.getSelectedValue().equals(m_clientStub.getMyself().getName())) {
-				note.setEditable(true);
+			if(selectedUser.equals(this.m_clientStub.getMyself().getName())) {
+				this.note.setEditable(true);
+			}else {
+				this.note.setEditable(false);
 			}
 		}
 	}
