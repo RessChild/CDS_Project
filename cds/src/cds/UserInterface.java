@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -41,6 +42,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	Container frame;
 	JButton ServerFileButton, LocalFileButton, nextBtn, preBtn, commentBtn;
 	JList userList;
+	DefaultListModel model;
 	JLabel fileLabel;
 	JTextArea note;//일단 실제 pdf대신 textArea로 놓는다
 	JLabel pdf;
@@ -60,6 +62,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 		this.m_clientStub = m_clientStub;
 		this.user = new Vector<>();
 		this.comments = new HashMap<>();
+		this.model = new DefaultListModel();
 		Toolkit kit = this.getToolkit();//시스템 정보를 가져옴, AWT에 있다.
 		Dimension screenSize= kit.getScreenSize();//반환값이 Dimension(폭과 높이정보를 가진 하나의 타입)
 		this.screenWidth = screenSize.width;
@@ -153,13 +156,12 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	public void userSwing(Vector<String> user) {
 		userPanel = new JPanel(new BorderLayout());
 		//users 리스트에 현재 사용자를 넣는 과정
-		String[] users = new String[user.size() + 1];
 		if(user.size() != 0) {
 			for(int i =0; i < user.size(); i++) {
-				users[i] = user.get(i);
+				model.addElement(user.get(i));
 			}
 		}
-		userList = new JList(users);
+		userList = new JList(model);
 		
 		userList.addListSelectionListener(this);
 		userPanel.add(userList, BorderLayout.NORTH);
@@ -221,12 +223,15 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	
 	// ########################
 	public void setComment(HashMap<Integer, String> comments) {
+		this.note.setEditable(true);
 		int currentPage = this.currPDF.getCurrentPageNum();
 		
 		if(comments.containsKey(currentPage)) {
 			note.setText(comments.get(currentPage));
 		}
 		this.comments = comments;
+		if(!this.note.isEditable()) 
+			this.note.setEditable(false);
 	}
 	
 	@Override

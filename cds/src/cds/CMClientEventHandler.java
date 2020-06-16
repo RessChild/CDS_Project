@@ -140,7 +140,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			this.c_fname = de.getDummyInfo();
 			System.out.println("[클라이언트] 선택한 파일 : "+ this.c_fname);
 			
-			File check = new File(m_clientStub.getTransferedFileHome() + "\\" + this.c_fname);
+			File check = new File(m_clientStub.getTransferedFileHome() + "/" + this.c_fname);
 			if(check.exists()) {
 				System.out.println("************* [클라이언트] 이미 해당 파일 있으니 그냥 열겠음"); // 얻은 메시지 확인
 				// ~~~ UI에 화면 출력하는 과정 거치도록..
@@ -187,7 +187,7 @@ public class CMClientEventHandler implements CMAppEventHandler {
 			break;
 		case CMFileEvent.END_FILE_TRANSFER_CHAN: // 18번 메시지 ( 파일 전송 종료 )
 			System.out.println("******** [클라이언트 파일이벤트] 파일 다받았당 ㅎ : "+ fe.getID());
-			UI.setLabel(m_clientStub.getTransferedFileHome() + "\\" + this.c_fname);
+			UI.setLabel(m_clientStub.getTransferedFileHome() + "/" + this.c_fname);
 //			UI.setLabel(m_clientStub.getTransferedFileHome() + "/" + this.c_fname);
 			break;
 		default:

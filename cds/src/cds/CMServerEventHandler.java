@@ -258,7 +258,7 @@ public class CMServerEventHandler implements CMAppEventHandler {
 		case CMFileEvent.END_FILE_TRANSFER_CHAN: // 18번 이벤트
 			System.out.println("**** [서버] 클라이언트에서 파일이 다들어왔다굿!");
 			
-			String fileName = m_serverStub.getTransferedFileHome() +"\\" + fe.getSender() +"\\"+ fe.getFileName();
+			String fileName = m_serverStub.getTransferedFileHome() +"/" + fe.getSender() +"/"+ fe.getFileName();
 			System.out.println("************* [서버] 도착한 파일 이름 : " + fileName);
 			s_pdf.put(fe.getFileName(), new ServerPDF(fileName, new File(fileName))); // 새로 얻은 파일을 리스트에 추가
 			
