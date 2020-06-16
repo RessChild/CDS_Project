@@ -223,6 +223,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 	
 	// ########################
 	public void setComment(HashMap<Integer, String> comments) {
+		boolean isEdit = this.note.isEditable();
 		this.note.setEditable(true);
 		int currentPage = this.currPDF.getCurrentPageNum();
 		
@@ -230,7 +231,7 @@ public class UserInterface extends JFrame implements ActionListener, ListSelecti
 			note.setText(comments.get(currentPage));
 		}
 		this.comments = comments;
-		if(!this.note.isEditable()) 
+		if(!isEdit) 
 			this.note.setEditable(false);
 	}
 	
